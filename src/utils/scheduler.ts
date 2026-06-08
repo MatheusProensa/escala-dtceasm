@@ -114,104 +114,96 @@ export function gerarEscala(
   datasEspeciais: DataEspecial[],
   allPreviousEscalas: Escala[]
 ): EscalaDia[] {
-  // Only active soldiers
   const activeSoldados = soldados.filter(s => s.ativo);
-
-  // Compute starting quadrinho counts from previous escalas
   const quadrinhos = computeQuadrinhos(allPreviousEscalas);
-
-  // Initialize counts for any soldier not yet in the map
   for (const s of activeSoldados) {
     if (!quadrinhos[s.id]) {
       quadrinhos[s.id] = { preta: 0, amarela: 0, vermelha: 0, roxa: 0 };
     }
   }
 
-  // Get history for 48h checks at period boundary
+  // History: dias servidos ANTES do período (para checar intervalo na fronteira)
   const history = getRecentHistory(allPreviousEscalas, inicio);
 
-  // Generate days
   const days = getDaysInRange(inicio, fim);
-  const generated: EscalaDia[] = [];
 
-  for (const dateStr of days) {
-    const tipo = getTipoQuadrinho(dateStr, datasEspeciais);
+  // Prioridade de tipo: roxa=0, vermelha=1, amarela=2, preta=3
+  // Processar dias na ordem de prioridade do tipo, não cronológica.
+  // Dentro do mesmo tipo, ordem cronológica.
+  const PRIO: Record<TipoQuadrinho, number> = { roxa: 0, vermelha: 1, amarela: 2, preta: 3 };
 
-    // Filter available soldiers (active + not unavailable today)
+  const daysSorted = days
+    .map(d => ({ data: d, tipo: getTipoQuadrinho(d, datasEspeciais) }))
+    .sort((a, b) => {
+      const dp = PRIO[a.tipo] - PRIO[b.tipo];
+      return dp !== 0 ? dp : a.data.localeCompare(b.data);
+    });
+
+  // Mapa de atribuições: data → soldadoId (construído na ordem de prioridade)
+  const assignments = new Map<string, string | null>();
+  const excMap = new Map<string, boolean>();
+
+  // Intervalo mínimo entre dois serviços do mesmo militar (|diff| >= 2)
+  // A checagem é BIDIRECIONAL: ao atribuir uma data, verificamos TODOS os dias já
+  // atribuídos (passados E futuros na escala) para garantir que não há serviços
+  // adjacentes. Isso evita o padrão Qua→Sex→Sáb causado pelo processamento
+  // cronológico (onde Sáb era atribuído sem saber que Ennes já pegaria Sex depois).
+  function minGapForSoldier(soldadoId: string, dateStr: string): number {
+    let min = Infinity;
+    // Histórico pré-período (apenas backward)
+    const lastHist = getLastServiceDate(soldadoId, dateStr, history, []);
+    if (lastHist) min = Math.min(min, dayDiff(lastHist, dateStr));
+    // Atribuições já feitas neste período (forward e backward)
+    for (const [d, id] of assignments) {
+      if (id === soldadoId) {
+        min = Math.min(min, Math.abs(dayDiff(d, dateStr)));
+      }
+    }
+    return min;
+  }
+
+  for (const { data: dateStr, tipo } of daysSorted) {
     const available = activeSoldados.filter(
       s => !isUnavailable(s.id, dateStr, indisponibilidades)
     );
 
     if (available.length === 0) {
-      generated.push({
-        data: dateStr,
-        tipoQuadrinho: tipo,
-        soldadoId: null,
-        excepcionouIntervalo: false,
-      });
+      assignments.set(dateStr, null);
+      excMap.set(dateStr, false);
       continue;
     }
 
-    // Regra de intervalo:
-    //   - Preferido: >= 2 dias de folga (diff >= 3)  → pool principal
-    //   - Permitido: 1 dia de folga (diff >= 2 / 48h) → só se pool principal vazio
-    //   - Proibido: dias consecutivos (diff < 2)      → último recurso, marca exceção
-    const withGoodRest = available.filter(s => {
-      const last = getLastServiceDate(s.id, dateStr, history, generated);
-      if (!last) return true;
-      return dayDiff(last, dateStr) >= 3;
-    });
+    // Pool com intervalo mínimo de 48h (diff >= 2, ou seja, ≥1 dia de folga)
+    const withRest = available.filter(s => minGapForSoldier(s.id, dateStr) >= 2);
+    const candidatos = withRest.length > 0 ? withRest : available;
+    const excepcionouIntervalo = withRest.length === 0 && available.length > 0;
 
-    const withMinRest = available.filter(s => {
-      const last = getLastServiceDate(s.id, dateStr, history, generated);
-      if (!last) return true;
-      return dayDiff(last, dateStr) >= 2;
-    });
-
-    const candidatos = withGoodRest.length > 0 ? withGoodRest
-      : withMinRest.length > 0 ? withMinRest
-      : available;
-    const excepcionouIntervalo = withMinRest.length === 0 && available.length > 0;
-
-    // Sort: fewer quadrinhos of this tipo first, then more junior (lower ordemAntiguidade) first
-    const sorted = [...candidatos].sort((a, b) => {
-      const qa = quadrinhos[a.id] ?? { preta: 0, amarela: 0, vermelha: 0, roxa: 0 };
-      const qb = quadrinhos[b.id] ?? { preta: 0, amarela: 0, vermelha: 0, roxa: 0 };
-      const countA = qa[tipo];
-      const countB = qb[tipo];
-
-      if (countA !== countB) return countA - countB; // fewer quadrinhos first
-
-      // Tie-breaker: most modern (higher ordemAntiguidade) first
+    // Ordenação: 1) menos quadrinhos do tipo, 2) mais moderno (maior ordemAntiguidade)
+    const chosen = [...candidatos].sort((a, b) => {
+      const qa = quadrinhos[a.id]?.[tipo] ?? 0;
+      const qb = quadrinhos[b.id]?.[tipo] ?? 0;
+      if (qa !== qb) return qa - qb;
       return b.ordemAntiguidade - a.ordemAntiguidade;
-    });
+    })[0];
 
-    const chosen = sorted[0];
-    if (!chosen) {
-      generated.push({
-        data: dateStr,
-        tipoQuadrinho: tipo,
-        soldadoId: null,
-        excepcionouIntervalo: false,
-      });
-      continue;
+    assignments.set(dateStr, chosen?.id ?? null);
+    excMap.set(dateStr, excepcionouIntervalo);
+
+    if (chosen) {
+      if (!quadrinhos[chosen.id]) {
+        quadrinhos[chosen.id] = { preta: 0, amarela: 0, vermelha: 0, roxa: 0 };
+      }
+      quadrinhos[chosen.id][tipo]++;
     }
-
-    // Update running counts
-    if (!quadrinhos[chosen.id]) {
-      quadrinhos[chosen.id] = { preta: 0, amarela: 0, vermelha: 0, roxa: 0 };
-    }
-    quadrinhos[chosen.id][tipo]++;
-
-    generated.push({
-      data: dateStr,
-      tipoQuadrinho: tipo,
-      soldadoId: chosen.id,
-      excepcionouIntervalo,
-    });
   }
 
-  return generated;
+  // Retornar em ordem cronológica
+  return days.map(dateStr => ({
+    data: dateStr,
+    tipoQuadrinho: getTipoQuadrinho(dateStr, datasEspeciais),
+    soldadoId: assignments.get(dateStr) ?? null,
+    excepcionouIntervalo: excMap.get(dateStr) ?? false,
+  }));
 }
 
 /**
