@@ -5,12 +5,22 @@ interface QuadrinhosProps {
   escalas: Escala[];
 }
 
-const TIPO_CONFIG: Record<TipoQuadrinho, { label: string; headerBg: string; headerColor: string; cellBg: string }> = {
-  preta:    { label: 'PRETA',    headerBg: '#111827', headerColor: '#fff',    cellBg: '#22c55e' },
-  amarela:  { label: 'AMARELA',  headerBg: '#d97706', headerColor: '#000',    cellBg: '#22c55e' },
-  vermelha: { label: 'VERMELHA', headerBg: '#dc2626', headerColor: '#fff',    cellBg: '#22c55e' },
-  roxa:     { label: 'ROXA',     headerBg: '#7c3aed', headerColor: '#fff',    cellBg: '#22c55e' },
+const TIPO_CONFIG: Record<TipoQuadrinho, { label: string; headerBg: string; headerColor: string }> = {
+  preta:    { label: 'PRETA',    headerBg: '#111827', headerColor: '#fff' },
+  amarela:  { label: 'AMARELA',  headerBg: '#d97706', headerColor: '#000' },
+  vermelha: { label: 'VERMELHA', headerBg: '#dc2626', headerColor: '#fff' },
+  roxa:     { label: 'ROXA',     headerBg: '#7c3aed', headerColor: '#fff' },
 };
+
+// Verde escuro = passado, azul = futuro, amarelo/dourado = hoje, cinza = lastro
+const COLORS = {
+  past:    { bg: '#16a34a', color: '#fff' },  // verde — serviço já realizado
+  today:   { bg: '#f59e0b', color: '#000' },  // dourado — serviço de hoje
+  future:  { bg: '#3b82f6', color: '#fff' },  // azul — escalado (futuro)
+  lastro:  { bg: '#94a3b8', color: '#fff' },  // cinza — LASTRO
+};
+
+type Entry = { display: string; rawDate: string | null; isLastro: boolean };
 
 function shortDate(dateStr: string): string {
   const parts = dateStr.split('-');
@@ -24,12 +34,11 @@ function buildRows(
   tipo: TipoQuadrinho,
   soldados: Soldado[],
   escalas: Escala[]
-): { soldado: Soldado; entries: string[]; total: number }[] {
+): { soldado: Soldado; entries: Entry[]; total: number }[] {
   const activeSoldados = soldados
     .filter(s => s.ativo)
     .sort((a, b) => a.ordemAntiguidade - b.ordemAntiguidade);
 
-  // Collect service dates per soldier for this tipo
   const serviceMap: Record<string, string[]> = {};
   for (const s of activeSoldados) serviceMap[s.id] = [];
 
@@ -46,7 +55,6 @@ function buildRows(
     const own = serviceMap[soldado.id] ?? [];
     const ownCount = own.length;
 
-    // Min count across ALL other soldiers (LASTRO only if behind all)
     const otherCounts = activeSoldados
       .filter(s => s.id !== soldado.id)
       .map(s => (serviceMap[s.id] ?? []).length);
@@ -55,19 +63,25 @@ function buildRows(
     const gap = minOthers - ownCount;
     const lastroCount = gap >= 2 ? Math.floor(gap / 2) : 0;
 
-    // LASTRO credits fill earliest empty positions (before real dates)
-    const entries: string[] = [
-      ...Array(lastroCount).fill('LASTRO'),
-      ...own.map(shortDate),
+    const entries: Entry[] = [
+      ...Array(lastroCount).fill(null).map((): Entry => ({ display: 'LASTRO', rawDate: null, isLastro: true })),
+      ...own.map((d): Entry => ({ display: shortDate(d), rawDate: d, isLastro: false })),
     ];
 
     return { soldado, entries, total: entries.length };
   });
 }
 
-export default function Quadrinhos({ soldados, escalas }: QuadrinhosProps) {
-  const tipos: TipoQuadrinho[] = ['preta', 'amarela', 'vermelha', 'roxa'];
+function cellStyle(entry: Entry, today: string): React.CSSProperties {
+  if (entry.isLastro) return { backgroundColor: COLORS.lastro.bg, color: COLORS.lastro.color };
+  if (entry.rawDate === today) return { backgroundColor: COLORS.today.bg, color: COLORS.today.color, fontWeight: 800, outline: '2px solid #92400e' };
+  if (entry.rawDate! < today) return { backgroundColor: COLORS.past.bg, color: COLORS.past.color };
+  return { backgroundColor: COLORS.future.bg, color: COLORS.future.color };
+}
 
+export default function Quadrinhos({ soldados, escalas }: QuadrinhosProps) {
+  const today = new Date().toISOString().split('T')[0]!;
+  const tipos: TipoQuadrinho[] = ['preta', 'amarela', 'vermelha', 'roxa'];
   const soldadoLabel = (s: Soldado) => s.patente ? `${s.patente} ${s.nome}` : s.nome;
 
   if (escalas.length === 0) {
@@ -96,6 +110,23 @@ export default function Quadrinhos({ soldados, escalas }: QuadrinhosProps) {
         </div>
       </div>
 
+      {/* Legend */}
+      <div className="card mb-4" style={{ padding: '0.6rem 1rem' }}>
+        <div style={{ display: 'flex', gap: '1.25rem', flexWrap: 'wrap', alignItems: 'center', fontSize: '0.78rem' }}>
+          {[
+            { color: COLORS.past.bg,   label: 'Realizado' },
+            { color: COLORS.today.bg,  label: 'Hoje' },
+            { color: COLORS.future.bg, label: 'Escalado (futuro)' },
+            { color: COLORS.lastro.bg, label: 'LASTRO' },
+          ].map(({ color, label }) => (
+            <span key={label} style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+              <span style={{ background: color, width: 12, height: 12, borderRadius: 3, display: 'inline-block', flexShrink: 0 }} />
+              {label}
+            </span>
+          ))}
+        </div>
+      </div>
+
       <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
         {tipos.map(tipo => {
           const cfg = TIPO_CONFIG[tipo];
@@ -104,7 +135,6 @@ export default function Quadrinhos({ soldados, escalas }: QuadrinhosProps) {
 
           return (
             <div key={tipo} className="card" style={{ padding: 0, overflow: 'hidden' }}>
-              {/* Section header */}
               <div style={{
                 backgroundColor: cfg.headerBg,
                 color: cfg.headerColor,
@@ -117,13 +147,11 @@ export default function Quadrinhos({ soldados, escalas }: QuadrinhosProps) {
                 {cfg.label}
               </div>
 
-              {/* Table */}
               <div style={{ overflowX: 'auto' }}>
                 <table style={{ borderCollapse: 'collapse', width: '100%', minWidth: 400 }}>
                   <tbody>
                     {rows.map(({ soldado, entries }, rowIdx) => (
                       <tr key={soldado.id} style={{ backgroundColor: rowIdx % 2 === 0 ? 'var(--bg-surface)' : 'var(--bg-elevated)' }}>
-                        {/* Soldier name — sticky */}
                         <td style={{
                           padding: '4px 10px',
                           fontWeight: 600,
@@ -139,24 +167,24 @@ export default function Quadrinhos({ soldados, escalas }: QuadrinhosProps) {
                           {soldadoLabel(soldado)}
                         </td>
 
-                        {/* Service entries */}
                         {Array.from({ length: maxCols }, (_, colIdx) => {
                           const entry = entries[colIdx];
-                          const hasEntry = entry !== undefined;
-                          const isLastro = entry === 'LASTRO';
+                          if (!entry) {
+                            return <td key={colIdx} style={{ minWidth: 64, border: '1px solid rgba(0,0,0,0.08)' }} />;
+                          }
+                          const cs = cellStyle(entry, today);
                           return (
                             <td key={colIdx} style={{
                               padding: '3px 6px',
                               fontSize: '0.72rem',
                               textAlign: 'center',
-                              fontWeight: 600,
+                              fontWeight: cs.fontWeight ?? 600,
                               border: '1px solid rgba(0,0,0,0.15)',
                               minWidth: 64,
-                              backgroundColor: !hasEntry ? 'transparent' : isLastro ? '#94a3b8' : cfg.cellBg,
-                              color: hasEntry ? '#fff' : 'transparent',
-                              fontStyle: isLastro ? 'italic' : 'normal',
+                              fontStyle: entry.isLastro ? 'italic' : 'normal',
+                              ...cs,
                             }}>
-                              {entry ?? ''}
+                              {entry.display}
                             </td>
                           );
                         })}
@@ -164,18 +192,6 @@ export default function Quadrinhos({ soldados, escalas }: QuadrinhosProps) {
                     ))}
                   </tbody>
                 </table>
-              </div>
-
-              {/* Legend */}
-              <div style={{ padding: '0.4rem 0.75rem', fontSize: '0.7rem', color: 'var(--text-secondary)', borderTop: '1px solid var(--border)', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                  <span style={{ background: cfg.cellBg, width: 10, height: 10, borderRadius: 2, display: 'inline-block' }} />
-                  Serviço realizado
-                </span>
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                  <span style={{ background: '#94a3b8', width: 10, height: 10, borderRadius: 2, display: 'inline-block' }} />
-                  LASTRO — crédito por 2+ colunas de defasagem em relação a todos
-                </span>
               </div>
             </div>
           );
