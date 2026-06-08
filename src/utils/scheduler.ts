@@ -173,10 +173,15 @@ export function gerarEscala(
       continue;
     }
 
-    // Pool com intervalo mínimo de 48h (diff >= 2, ou seja, ≥1 dia de folga)
-    const withRest = available.filter(s => minGapForSoldier(s.id, dateStr) >= 2);
-    const candidatos = withRest.length > 0 ? withRest : available;
-    const excepcionouIntervalo = withRest.length === 0 && available.length > 0;
+    // Pool preferencial: ≥2 dias de folga entre serviços (diff >= 3)
+    // Fallback:         ≥1 dia de folga (diff >= 2) — último recurso
+    // Emergência:       dias consecutivos — marca exceção
+    const withGoodRest = available.filter(s => minGapForSoldier(s.id, dateStr) >= 3);
+    const withMinRest  = available.filter(s => minGapForSoldier(s.id, dateStr) >= 2);
+    const candidatos = withGoodRest.length > 0 ? withGoodRest
+      : withMinRest.length > 0 ? withMinRest
+      : available;
+    const excepcionouIntervalo = withMinRest.length === 0 && available.length > 0;
 
     // Ordenação: 1) menos quadrinhos do tipo, 2) mais moderno (maior ordemAntiguidade)
     const chosen = [...candidatos].sort((a, b) => {
