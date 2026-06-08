@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { Tela } from './types';
 import { useAppData } from './hooks/useAppData';
 import { useSettings } from './hooks/useSettings';
+import { supabase } from './lib/supabase';
 import Layout from './components/Layout';
 import Sidebar from './components/Sidebar';
 import Topbar from './components/Topbar';
@@ -26,26 +27,64 @@ const telaLabels: Record<Tela, string> = {
 
 export default function App() {
   const [currentTela, setCurrentTela] = useState<Tela>('dashboard');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [authLoading, setAuthLoading] = useState(true);
   const appData = useAppData();
   const settings = useSettings();
 
-  const [isAuthenticated, setIsAuthenticated] = useState(
-    () => !localStorage.getItem('escala-dtceasm-password')
-  );
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsAuthenticated(!!session);
+      setAuthLoading(false);
+    });
 
-  function handleLogin(password: string): boolean {
-    const ok = settings.checkPassword(password);
-    if (ok) setIsAuthenticated(true);
-    return ok;
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsAuthenticated(!!session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  async function handleLogin(email: string, password: string): Promise<string | null> {
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) return 'Email ou senha incorretos.';
+    return null;
   }
 
-  function handleLogout() {
-    setIsAuthenticated(false);
+  async function handleLogout() {
+    await supabase.auth.signOut();
     setCurrentTela('dashboard');
+  }
+
+  if (authLoading) {
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', flexDirection: 'column', gap: '1rem' }}>
+        <div style={{ width: 32, height: 32, border: '3px solid var(--border)', borderTopColor: 'var(--accent)', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+        <span style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>Verificando acesso...</span>
+      </div>
+    );
   }
 
   if (!isAuthenticated) {
     return <Login onLogin={handleLogin} />;
+  }
+
+  if (appData.loading) {
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', flexDirection: 'column', gap: '1rem' }}>
+        <div style={{ width: 32, height: 32, border: '3px solid var(--border)', borderTopColor: 'var(--accent)', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+        <span style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>Carregando dados...</span>
+      </div>
+    );
+  }
+
+  if (appData.error) {
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', flexDirection: 'column', gap: '1rem' }}>
+        <span style={{ color: 'var(--danger)', fontSize: '0.875rem' }}>{appData.error}</span>
+        <button className="btn btn-primary" onClick={() => window.location.reload()}>Tentar novamente</button>
+      </div>
+    );
   }
 
   function renderTela() {
@@ -113,10 +152,8 @@ export default function App() {
             escalante={settings.escalante}
             comandante={settings.comandante}
             theme={settings.theme}
-            hasPassword={settings.hasPassword}
             onSave={(e, c) => { settings.setEscalante(e); settings.setComandante(c); }}
             onToggleTheme={settings.toggleTheme}
-            onSetPassword={settings.setPassword}
             onLogout={handleLogout}
           />
         );

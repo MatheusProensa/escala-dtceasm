@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import type { AppData, Soldado, Indisponibilidade, DataEspecial, Escala } from '../types';
-
-const STORAGE_KEY = 'escala-dtceasm-data';
+import { supabase } from '../lib/supabase';
 
 const defaultData: AppData = {
   soldados: [],
@@ -10,38 +9,84 @@ const defaultData: AppData = {
   escalas: [],
 };
 
-function loadData(): AppData {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return defaultData;
-    const parsed = JSON.parse(raw) as Partial<AppData>;
-    return {
-      soldados: parsed.soldados ?? [],
-      indisponibilidades: parsed.indisponibilidades ?? [],
-      datasEspeciais: parsed.datasEspeciais ?? [],
-      escalas: parsed.escalas ?? [],
-    };
-  } catch {
-    return defaultData;
-  }
-}
-
 function generateId(): string {
-  return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+  return crypto.randomUUID();
 }
 
 export function useAppData() {
-  const [data, setData] = useState<AppData>(loadData);
+  const [data, setData] = useState<AppData>(defaultData);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-  }, [data]);
+    loadAllData();
+  }, []);
+
+  async function loadAllData() {
+    setLoading(true);
+    setError(null);
+    try {
+      const [soldadosRes, indispRes, datasRes, escalasRes] = await Promise.all([
+        supabase.from('soldados').select('*').order('ordem_antiguidade'),
+        supabase.from('indisponibilidades').select('*'),
+        supabase.from('datas_especiais').select('*'),
+        supabase.from('escalas').select('*').order('gerada_em', { ascending: false }),
+      ]);
+
+      if (soldadosRes.error) throw soldadosRes.error;
+      if (indispRes.error) throw indispRes.error;
+      if (datasRes.error) throw datasRes.error;
+      if (escalasRes.error) throw escalasRes.error;
+
+      setData({
+        soldados: (soldadosRes.data ?? []).map(s => ({
+          id: s.id as string,
+          nome: s.nome as string,
+          patente: s.patente as string,
+          ativo: s.ativo as boolean,
+          ordemAntiguidade: s.ordem_antiguidade as number,
+        })),
+        indisponibilidades: (indispRes.data ?? []).map(i => ({
+          id: i.id as string,
+          soldadoId: i.soldado_id as string,
+          dataInicio: i.data_inicio as string,
+          dataFim: i.data_fim as string,
+          motivo: i.motivo as string,
+        })),
+        datasEspeciais: (datasRes.data ?? []).map(d => ({
+          id: d.id as string,
+          data: d.data as string,
+          tipo: d.tipo as DataEspecial['tipo'],
+          descricao: d.descricao as string,
+        })),
+        escalas: (escalasRes.data ?? []).map(e => ({
+          id: e.id as string,
+          nome: e.nome as string,
+          periodo: { inicio: e.periodo_inicio as string, fim: e.periodo_fim as string },
+          dias: e.dias as Escala['dias'],
+          geradaEm: e.gerada_em as string,
+        })),
+      });
+    } catch (err) {
+      console.error('loadAllData:', err);
+      setError('Erro ao carregar dados. Verifique a conexão.');
+    } finally {
+      setLoading(false);
+    }
+  }
 
   // ---- Soldados ----
 
   function addSoldado(soldado: Omit<Soldado, 'id'>): Soldado {
     const newSoldado: Soldado = { ...soldado, id: generateId() };
     setData(prev => ({ ...prev, soldados: [...prev.soldados, newSoldado] }));
+    supabase.from('soldados').insert({
+      id: newSoldado.id,
+      nome: newSoldado.nome,
+      patente: newSoldado.patente,
+      ativo: newSoldado.ativo,
+      ordem_antiguidade: newSoldado.ordemAntiguidade,
+    }).then(({ error }) => { if (error) console.error('addSoldado:', error); });
     return newSoldado;
   }
 
@@ -50,6 +95,13 @@ export function useAppData() {
       ...prev,
       soldados: prev.soldados.map(s => (s.id === id ? { ...s, ...updates } : s)),
     }));
+    const dbUpdates: Record<string, unknown> = {};
+    if (updates.nome !== undefined) dbUpdates.nome = updates.nome;
+    if (updates.patente !== undefined) dbUpdates.patente = updates.patente;
+    if (updates.ativo !== undefined) dbUpdates.ativo = updates.ativo;
+    if (updates.ordemAntiguidade !== undefined) dbUpdates.ordem_antiguidade = updates.ordemAntiguidade;
+    supabase.from('soldados').update(dbUpdates).eq('id', id)
+      .then(({ error }) => { if (error) console.error('updateSoldado:', error); });
   }
 
   function deleteSoldado(id: string): void {
@@ -58,6 +110,8 @@ export function useAppData() {
       soldados: prev.soldados.filter(s => s.id !== id),
       indisponibilidades: prev.indisponibilidades.filter(i => i.soldadoId !== id),
     }));
+    supabase.from('soldados').delete().eq('id', id)
+      .then(({ error }) => { if (error) console.error('deleteSoldado:', error); });
   }
 
   function reorderSoldados(soldadoId: string, direction: 'up' | 'down'): void {
@@ -65,18 +119,17 @@ export function useAppData() {
       const sorted = [...prev.soldados].sort((a, b) => a.ordemAntiguidade - b.ordemAntiguidade);
       const idx = sorted.findIndex(s => s.id === soldadoId);
       if (idx < 0) return prev;
-
       const targetIdx = direction === 'up' ? idx - 1 : idx + 1;
       if (targetIdx < 0 || targetIdx >= sorted.length) return prev;
-
-      // Swap ordemAntiguidade values
       const current = sorted[idx];
       const target = sorted[targetIdx];
       if (!current || !target) return prev;
-
       const currentOrd = current.ordemAntiguidade;
       const targetOrd = target.ordemAntiguidade;
-
+      supabase.from('soldados').update({ ordem_antiguidade: targetOrd }).eq('id', current.id)
+        .then(({ error }) => { if (error) console.error('reorder1:', error); });
+      supabase.from('soldados').update({ ordem_antiguidade: currentOrd }).eq('id', target.id)
+        .then(({ error }) => { if (error) console.error('reorder2:', error); });
       return {
         ...prev,
         soldados: prev.soldados.map(s => {
@@ -92,10 +145,14 @@ export function useAppData() {
 
   function addIndisponibilidade(ind: Omit<Indisponibilidade, 'id'>): void {
     const newInd: Indisponibilidade = { ...ind, id: generateId() };
-    setData(prev => ({
-      ...prev,
-      indisponibilidades: [...prev.indisponibilidades, newInd],
-    }));
+    setData(prev => ({ ...prev, indisponibilidades: [...prev.indisponibilidades, newInd] }));
+    supabase.from('indisponibilidades').insert({
+      id: newInd.id,
+      soldado_id: newInd.soldadoId,
+      data_inicio: newInd.dataInicio,
+      data_fim: newInd.dataFim,
+      motivo: newInd.motivo,
+    }).then(({ error }) => { if (error) console.error('addIndisp:', error); });
   }
 
   function deleteIndisponibilidade(id: string): void {
@@ -103,23 +160,27 @@ export function useAppData() {
       ...prev,
       indisponibilidades: prev.indisponibilidades.filter(i => i.id !== id),
     }));
+    supabase.from('indisponibilidades').delete().eq('id', id)
+      .then(({ error }) => { if (error) console.error('deleteIndisp:', error); });
   }
 
   // ---- Datas Especiais ----
 
   function addDataEspecial(de: Omit<DataEspecial, 'id'>): void {
     const newDE: DataEspecial = { ...de, id: generateId() };
-    setData(prev => ({
-      ...prev,
-      datasEspeciais: [...prev.datasEspeciais, newDE],
-    }));
+    setData(prev => ({ ...prev, datasEspeciais: [...prev.datasEspeciais, newDE] }));
+    supabase.from('datas_especiais').insert({
+      id: newDE.id,
+      data: newDE.data,
+      tipo: newDE.tipo,
+      descricao: newDE.descricao,
+    }).then(({ error }) => { if (error) console.error('addDataEspecial:', error); });
   }
 
   function deleteDataEspecial(id: string): void {
-    setData(prev => ({
-      ...prev,
-      datasEspeciais: prev.datasEspeciais.filter(d => d.id !== id),
-    }));
+    setData(prev => ({ ...prev, datasEspeciais: prev.datasEspeciais.filter(d => d.id !== id) }));
+    supabase.from('datas_especiais').delete().eq('id', id)
+      .then(({ error }) => { if (error) console.error('deleteDataEspecial:', error); });
   }
 
   // ---- Escalas ----
@@ -130,22 +191,28 @@ export function useAppData() {
       id: generateId(),
       geradaEm: new Date().toISOString(),
     };
-    setData(prev => ({
-      ...prev,
-      escalas: [...prev.escalas, newEscala],
-    }));
+    setData(prev => ({ ...prev, escalas: [...prev.escalas, newEscala] }));
+    supabase.from('escalas').insert({
+      id: newEscala.id,
+      nome: newEscala.nome,
+      periodo_inicio: newEscala.periodo.inicio,
+      periodo_fim: newEscala.periodo.fim,
+      dias: newEscala.dias,
+      gerada_em: newEscala.geradaEm,
+    }).then(({ error }) => { if (error) console.error('saveEscala:', error); });
     return newEscala;
   }
 
   function deleteEscala(id: string): void {
-    setData(prev => ({
-      ...prev,
-      escalas: prev.escalas.filter(e => e.id !== id),
-    }));
+    setData(prev => ({ ...prev, escalas: prev.escalas.filter(e => e.id !== id) }));
+    supabase.from('escalas').delete().eq('id', id)
+      .then(({ error }) => { if (error) console.error('deleteEscala:', error); });
   }
 
   return {
     data,
+    loading,
+    error,
     addSoldado,
     updateSoldado,
     deleteSoldado,

@@ -1,49 +1,28 @@
 import { useState } from 'react';
-import { Sun, Moon, Info, Lock, Shield } from 'lucide-react';
+import { Sun, Moon, Info, LogOut } from 'lucide-react';
 
 interface ConfiguracoesProps {
   escalante: string;
   comandante: string;
   theme: 'dark' | 'light';
-  hasPassword: boolean;
   onSave: (escalante: string, comandante: string) => void;
   onToggleTheme: () => void;
-  onSetPassword: (password: string) => void;
   onLogout: () => void;
 }
 
 export default function Configuracoes({
-  escalante, comandante, theme, hasPassword,
-  onSave, onToggleTheme, onSetPassword, onLogout,
+  escalante, comandante, theme,
+  onSave, onToggleTheme, onLogout,
 }: ConfiguracoesProps) {
   const [localEscalante, setLocalEscalante] = useState(escalante);
   const [localComandante, setLocalComandante] = useState(comandante);
   const [saved, setSaved] = useState(false);
-
-  const [novaSenha, setNovaSenha] = useState('');
-  const [confirmarSenha, setConfirmarSenha] = useState('');
-  const [senhaErro, setSenhaErro] = useState('');
-  const [senhaSalva, setSenhaSalva] = useState(false);
 
   function handleSave(e: React.FormEvent) {
     e.preventDefault();
     onSave(localEscalante, localComandante);
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
-  }
-
-  function handleSalvarSenha(e: React.FormEvent) {
-    e.preventDefault();
-    if (novaSenha && novaSenha !== confirmarSenha) {
-      setSenhaErro('As senhas não coincidem.');
-      return;
-    }
-    onSetPassword(novaSenha);
-    setNovaSenha('');
-    setConfirmarSenha('');
-    setSenhaErro('');
-    setSenhaSalva(true);
-    setTimeout(() => setSenhaSalva(false), 2500);
   }
 
   return (
@@ -107,50 +86,15 @@ export default function Configuracoes({
 
       <div className="card mb-4">
         <div className="card-header">
-          <span className="card-title"><Shield size={16} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '0.375rem' }} />Segurança</span>
+          <span className="card-title">Sessão</span>
         </div>
         <div style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginBottom: '0.75rem' }}>
-          {hasPassword
-            ? 'O sistema está protegido por senha. Deixe os campos em branco para remover a senha.'
-            : 'Defina uma senha para proteger o acesso ao sistema.'}
+          Encerra a sessão atual e retorna à tela de login.
         </div>
-        <form onSubmit={handleSalvarSenha}>
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="cfg-senha">Nova senha</label>
-              <input
-                id="cfg-senha"
-                type="password"
-                value={novaSenha}
-                onChange={e => { setNovaSenha(e.target.value); setSenhaErro(''); setSenhaSalva(false); }}
-                placeholder={hasPassword ? 'Nova senha (ou vazio para remover)' : 'Digite a senha'}
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="cfg-senha2">Confirmar senha</label>
-              <input
-                id="cfg-senha2"
-                type="password"
-                value={confirmarSenha}
-                onChange={e => { setConfirmarSenha(e.target.value); setSenhaErro(''); }}
-                placeholder="Repita a senha"
-              />
-            </div>
-          </div>
-          {senhaErro && <div className="text-danger text-sm mb-2">{senhaErro}</div>}
-          {senhaSalva && <div className="text-sm mb-2" style={{ color: 'var(--success)' }}>✓ {novaSenha ? 'Senha definida com sucesso!' : 'Senha removida.'}</div>}
-          <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-            <button className="btn btn-primary" type="submit">
-              <Lock size={15} />
-              {hasPassword ? 'Alterar senha' : 'Definir senha'}
-            </button>
-            {hasPassword && (
-              <button className="btn btn-ghost btn-sm" type="button" onClick={onLogout}>
-                Sair (logout)
-              </button>
-            )}
-          </div>
-        </form>
+        <button className="btn btn-ghost" type="button" onClick={onLogout}>
+          <LogOut size={15} />
+          Sair (logout)
+        </button>
       </div>
     </div>
   );
