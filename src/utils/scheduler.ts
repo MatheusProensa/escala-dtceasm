@@ -152,26 +152,19 @@ export function gerarEscala(
       continue;
     }
 
-    // Vermelha (SAB/DOM) e roxa (feriados) são prioridade máxima — sem regra de 48h.
-    // Amarela (SEX) também é prioridade — sem regra de 48h.
-    // Preta (Seg-Qui) respeita a regra de 48h (≥3 dias desde o último serviço).
-    let candidatos: typeof available;
-    let excepcionouIntervalo = false;
+    // Regra 24h: militar não pode servir em dias consecutivos (diff >= 2).
+    // 48h de intervalo é PERMITIDO — aplica para todos os tipos.
+    // Prioridade de tipo: roxa > vermelha > amarela > preta (cada dia já seleciona
+    // quem tem menos daquele tipo, garantindo o balanceamento por prioridade).
+    const withInterval = available.filter(s => {
+      const lastService = getLastServiceDate(s.id, dateStr, history, generated);
+      if (!lastService) return true;
+      const diff = dayDiff(lastService, dateStr);
+      return diff >= 2; // mínimo 1 dia de folga entre serviços
+    });
 
-    if (tipo === 'vermelha' || tipo === 'amarela' || tipo === 'roxa') {
-      // Prioridade alta: ignora intervalo, pega quem tem menos desse tipo
-      candidatos = available;
-    } else {
-      // Preta: aplica regra de 48h
-      const preferred = available.filter(s => {
-        const lastService = getLastServiceDate(s.id, dateStr, history, generated);
-        if (!lastService) return true;
-        const diff = dayDiff(lastService, dateStr);
-        return diff >= 3;
-      });
-      candidatos = preferred.length > 0 ? preferred : available;
-      excepcionouIntervalo = preferred.length === 0 && available.length > 0;
-    }
+    const candidatos = withInterval.length > 0 ? withInterval : available;
+    const excepcionouIntervalo = withInterval.length === 0 && available.length > 0;
 
     // Sort: fewer quadrinhos of this tipo first, then more junior (lower ordemAntiguidade) first
     const sorted = [...candidatos].sort((a, b) => {
