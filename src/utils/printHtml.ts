@@ -160,10 +160,10 @@ tr td{height:17px;font-size:8.5pt}
 .da{width:5%;text-align:center}
 .nm{width:24%;font-weight:normal}
 
-/* Fim de semana - apenas dia e nome coloridos, nro da linha mantém cor padrão */
-.weekend .da,.weekend .nm{color:#cc0000;font-weight:bold}
+/* Fim de semana */
+.weekend .dn,.weekend .da,.weekend .nm{color:#cc0000;font-weight:bold}
 /* Sexta */
-.friday .da,.friday .nm{background-color:#ffffc0;font-weight:bold}
+.friday .dn,.friday .da,.friday .nm{background-color:#ffffc0;font-weight:bold}
 
 /* Seção direita */
 .ri-header{font-weight:bold;font-size:8pt;padding-left:6px}

@@ -680,6 +680,26 @@ tr.exception-row td {
   background-color: rgba(217, 119, 6, 0.08);
 }
 
+/* Fim de semana — texto vermelho e negrito */
+tr.row-weekend td {
+  color: #cc2200 !important;
+  font-weight: 700 !important;
+}
+
+/* Sexta-feira — fundo amarelo */
+tr.row-friday td {
+  background-color: rgba(251, 191, 36, 0.18) !important;
+  font-weight: 600 !important;
+}
+
+[data-theme="light"] tr.row-weekend td {
+  color: #b91c1c !important;
+}
+
+[data-theme="light"] tr.row-friday td {
+  background-color: rgba(234, 179, 8, 0.22) !important;
+}
+
 /* ===== Historico Viewer ===== */
 .escala-list {
   display: flex;
