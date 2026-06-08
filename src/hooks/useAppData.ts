@@ -19,7 +19,25 @@ export function useAppData() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    loadAllData();
+    // Only load data when there's an active session (RLS requires auth)
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        loadAllData();
+      } else {
+        setLoading(false);
+      }
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'SIGNED_IN') {
+        loadAllData();
+      } else if (event === 'SIGNED_OUT') {
+        setData(defaultData);
+        setLoading(false);
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   async function loadAllData() {
