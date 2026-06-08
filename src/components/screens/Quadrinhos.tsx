@@ -152,7 +152,7 @@ export default function Quadrinhos({ soldados, escalas }: QuadrinhosProps) {
         {tipos.map(tipo => {
           const cfg = TIPO_CONFIG[tipo];
           const rows = buildRows(tipo, soldados, escalas);
-          const maxCols = Math.max(...rows.map(r => r.total), 1);
+          const maxCols = Math.max(...rows.map(r => r.total), 5);
 
           return (
             <div key={tipo} className="card" style={{ padding: 0, overflow: 'hidden' }}>
@@ -169,7 +169,11 @@ export default function Quadrinhos({ soldados, escalas }: QuadrinhosProps) {
               </div>
 
               <div style={{ overflowX: 'auto' }}>
-                <table style={{ borderCollapse: 'collapse', width: '100%', minWidth: 400 }}>
+                <table style={{ borderCollapse: 'collapse', width: '100%', minWidth: 400, tableLayout: 'fixed' }}>
+                  <colgroup>
+                    <col style={{ width: 160 }} />
+                    {Array.from({ length: maxCols }, (_, i) => <col key={i} style={{ width: 70 }} />)}
+                  </colgroup>
                   <tbody>
                     {rows.map(({ soldado, entries }, rowIdx) => (
                       <tr key={soldado.id} style={{ backgroundColor: rowIdx % 2 === 0 ? 'var(--bg-surface)' : 'var(--bg-elevated)' }}>
@@ -178,8 +182,10 @@ export default function Quadrinhos({ soldados, escalas }: QuadrinhosProps) {
                           fontWeight: 600,
                           fontSize: '0.78rem',
                           whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
                           borderRight: '2px solid var(--border)',
-                          minWidth: 140,
+                          width: 160,
                           position: 'sticky',
                           left: 0,
                           backgroundColor: rowIdx % 2 === 0 ? 'var(--bg-surface)' : 'var(--bg-elevated)',
