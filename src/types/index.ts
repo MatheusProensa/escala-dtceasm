@@ -38,7 +38,7 @@ export interface Escala {
   geradaEm: string;
 }
 
-export type Tela = 'dashboard' | 'soldados' | 'indisponibilidade' | 'datas-especiais' | 'gerar' | 'historico' | 'configuracoes';
+export type Tela = 'dashboard' | 'soldados' | 'indisponibilidade' | 'datas-especiais' | 'gerar' | 'historico' | 'quadrinhos' | 'regulamento' | 'configuracoes';
 
 export interface AppData {
   soldados: Soldado[];

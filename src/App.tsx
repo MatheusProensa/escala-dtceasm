@@ -14,6 +14,8 @@ import DatasEspeciais from './components/screens/DatasEspeciais';
 import GerarEscala from './components/screens/GerarEscala';
 import Historico from './components/screens/Historico';
 import Configuracoes from './components/screens/Configuracoes';
+import Quadrinhos from './components/screens/Quadrinhos';
+import Regulamento from './components/screens/Regulamento';
 
 const telaLabels: Record<Tela, string> = {
   dashboard: 'Início',
@@ -22,6 +24,8 @@ const telaLabels: Record<Tela, string> = {
   'datas-especiais': 'Datas Especiais',
   gerar: 'Gerar Escala',
   historico: 'Histórico de Escalas',
+  quadrinhos: 'Quadrinhos',
+  regulamento: 'Regulamento',
   configuracoes: 'Configurações',
 };
 
@@ -146,6 +150,15 @@ export default function App() {
             comandante={settings.comandante}
           />
         );
+      case 'quadrinhos':
+        return (
+          <Quadrinhos
+            soldados={appData.data.soldados}
+            escalas={appData.data.escalas}
+          />
+        );
+      case 'regulamento':
+        return <Regulamento />;
       case 'configuracoes':
         return (
           <Configuracoes
