@@ -1,3 +1,4 @@
+import { FileSpreadsheet, FileDown } from 'lucide-react';
 import type { Soldado, Escala, TipoQuadrinho } from '../../types';
 
 interface QuadrinhosProps {
@@ -107,6 +108,26 @@ export default function Quadrinhos({ soldados, escalas }: QuadrinhosProps) {
         <div>
           <div className="page-title">Quadrinhos</div>
           <div className="page-subtitle">Contabilização dos serviços por tipo — histórico completo</div>
+        </div>
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <button
+            className="btn btn-secondary"
+            onClick={() => import('../../utils/quadrinhosExport').then(m => m.exportQuadrinhosExcel(soldados, escalas))}
+            type="button"
+            title="Exportar para Excel"
+          >
+            <FileSpreadsheet size={15} />
+            Excel
+          </button>
+          <button
+            className="btn btn-primary"
+            onClick={() => import('../../utils/quadrinhosExport').then(m => m.exportQuadrinhosPdf(soldados, escalas))}
+            type="button"
+            title="Exportar para PDF"
+          >
+            <FileDown size={15} />
+            PDF
+          </button>
         </div>
       </div>
 
