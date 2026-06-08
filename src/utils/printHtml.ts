@@ -147,12 +147,12 @@ table{border-collapse:collapse;width:100%}
 td{border:1px solid #000;vertical-align:middle;padding:2px 4px}
 
 /* Cabeçalho */
-.h-logo{font-size:11pt;font-weight:bold;text-align:center;width:15%}
-.h-mes-label{text-align:center;font-size:8pt;color:#444;width:18%}
-.h-mes{font-size:15pt;font-weight:bold;text-align:center}
-.h-orgao{font-size:8pt;text-align:center}
-.h-rl{font-size:7pt;color:#666;padding-bottom:1px}
-.h-rv{font-size:9pt;font-weight:bold}
+.h-logo{font-size:11pt;font-weight:bold;text-align:center;vertical-align:middle}
+.h-mes-label{text-align:center;font-size:8pt;color:#333;vertical-align:middle}
+.h-mes{font-size:14pt;font-weight:bold;text-align:center;vertical-align:middle}
+.h-orgao{font-size:7.5pt;text-align:center;vertical-align:middle}
+.h-rl{font-size:7pt;color:#333;text-align:center;vertical-align:bottom;padding-bottom:2px}
+.h-rv{font-size:10pt;font-weight:bold;text-align:center;vertical-align:top;padding-top:2px}
 
 /* Linhas da escala */
 tr td{height:17px;font-size:8.5pt}
@@ -188,9 +188,9 @@ tr td{height:17px;font-size:8.5pt}
 
 <table style="margin-bottom:0">
   <colgroup>
-    <col style="width:15%">
-    <col style="width:18%">
-    <col style="width:67%">
+    <col style="width:17%">
+    <col style="width:20%">
+    <col style="width:63%">
   </colgroup>
   <tr>
     <td rowspan="2" class="h-logo">BASM<br>DTCEA - SM</td>
