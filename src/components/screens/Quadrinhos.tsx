@@ -171,7 +171,7 @@ export default function Quadrinhos({ soldados, escalas }: QuadrinhosProps) {
               <div style={{ overflowX: 'auto' }}>
                 <table style={{ borderCollapse: 'collapse', width: '100%', minWidth: 400, tableLayout: 'fixed' }}>
                   <colgroup>
-                    <col style={{ width: 160 }} />
+                    <col style={{ width: 130 }} />
                     {Array.from({ length: maxCols }, (_, i) => <col key={i} style={{ width: 70 }} />)}
                   </colgroup>
                   <tbody>
@@ -185,7 +185,7 @@ export default function Quadrinhos({ soldados, escalas }: QuadrinhosProps) {
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
                           borderRight: '2px solid var(--border)',
-                          width: 160,
+                          width: 130,
                           position: 'sticky',
                           left: 0,
                           backgroundColor: rowIdx % 2 === 0 ? 'var(--bg-surface)' : 'var(--bg-elevated)',

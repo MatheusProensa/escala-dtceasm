@@ -94,13 +94,13 @@ function buildTableHtml(tipo: TipoQuadrinho, rows: RowData[], today: string): st
   const c = cfg[tipo];
   const maxCols = Math.max(...rows.map(r => r.dates.length + r.lastroCount), 5);
 
-  const colgroup = `<colgroup><col style="width:150px">${Array(maxCols).fill('<col style="width:60px">').join('')}</colgroup>`;
+  const colgroup = `<colgroup><col style="width:125px">${Array(maxCols).fill('<col style="width:60px">').join('')}</colgroup>`;
 
   let tbody = '';
   rows.forEach(({ soldado, dates, lastroCount }, idx) => {
     const label = soldado.patente ? `${soldado.patente} ${soldado.nome}` : soldado.nome;
     const rowBg = idx % 2 === 0 ? '#fff' : '#f5f5f5';
-    let cells = `<td class="nm" style="background:${rowBg};width:150px">${esc(label)}</td>`;
+    let cells = `<td class="nm" style="background:${rowBg};width:125px">${esc(label)}</td>`;
 
     const entries: { display: string; rawDate: string | null; isLastro: boolean }[] = [
       ...Array(lastroCount).fill(null).map(() => ({ display: 'LASTRO', rawDate: null, isLastro: true })),
@@ -176,7 +176,7 @@ body{font-family:Arial,Helvetica,sans-serif;background:#fff;color:#000;font-size
 /* ── Tabela ── */
 table{border-collapse:collapse;width:100%}
 td{border:1px solid rgba(0,0,0,.12);vertical-align:middle;padding:2px 4px;white-space:nowrap}
-.nm{font-size:8pt;font-weight:600;width:150px;min-width:150px;max-width:150px;padding:2px 8px;overflow:hidden;white-space:nowrap;border-right:2px solid #9ca3af}
+.nm{font-size:8pt;font-weight:600;width:125px;min-width:125px;max-width:125px;padding:2px 8px;overflow:hidden;white-space:nowrap;border-right:2px solid #9ca3af}
 .dc{font-size:7.5pt;text-align:center;min-width:52px}
 .dc.empty{background:#fff}
 
