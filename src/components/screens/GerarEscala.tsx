@@ -300,10 +300,17 @@ export default function GerarEscala({
                   </tr>
                 </thead>
                 <tbody>
-                  {preview.map(dia => (
-                    <tr key={dia.data} className={dia.excepcionouIntervalo ? 'exception-row' : ''}>
-                      <td style={{ fontFamily: 'monospace' }}>{formatDateBR(dia.data)}</td>
-                      <td className="text-secondary">{getDayName(dia.data)}</td>
+                  {preview.map(dia => {
+                    const dow = new Date(dia.data + 'T12:00:00').getDay();
+                    const rowCls = [
+                      dia.excepcionouIntervalo ? 'exception-row' : '',
+                      dow === 0 || dow === 6 ? 'row-weekend' : '',
+                      dow === 5 ? 'row-friday' : '',
+                    ].filter(Boolean).join(' ');
+                    return (
+                    <tr key={dia.data} className={rowCls}>
+                      <td style={{ fontFamily: 'monospace', fontWeight: 600 }}>{formatDateBR(dia.data)}</td>
+                      <td style={{ fontWeight: 600 }}>{getDayName(dia.data)}</td>
                       <td>
                         <span className={`badge badge-${dia.tipoQuadrinho}`}>
                           {tipoLabel(dia.tipoQuadrinho)}
@@ -324,7 +331,8 @@ export default function GerarEscala({
                         )}
                       </td>
                     </tr>
-                  ))}
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
