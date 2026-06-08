@@ -150,7 +150,8 @@ td{border:1px solid #000;vertical-align:middle;padding:2px 4px}
 .h-logo{font-size:11pt;font-weight:bold;text-align:center;vertical-align:middle}
 .h-mes-label{text-align:center;font-size:8pt;color:#333;vertical-align:middle}
 .h-mes{font-size:14pt;font-weight:bold;text-align:center;vertical-align:middle}
-.h-orgao{font-size:7pt;text-align:center;vertical-align:middle;line-height:1.3}
+.h-orgao{font-size:7pt;text-align:center;vertical-align:middle;line-height:1.4}
+.h-orgao strong{font-size:9pt}
 .h-rl{font-size:7pt;color:#333;text-align:center;vertical-align:bottom;padding-bottom:2px;height:18px}
 .h-rv{font-size:10pt;font-weight:bold;text-align:center;vertical-align:bottom;padding-bottom:4px;height:44px}
 
@@ -193,9 +194,9 @@ tr td{height:17px;font-size:8.5pt}
 
 <table style="margin-bottom:0">
   <colgroup>
-    <col style="width:17%">
     <col style="width:20%">
-    <col style="width:63%">
+    <col style="width:20%">
+    <col style="width:60%">
   </colgroup>
   <tr>
     <td rowspan="2" class="h-logo">BASM<br>DTCEA - SM</td>
