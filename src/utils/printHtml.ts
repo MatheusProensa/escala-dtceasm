@@ -177,9 +177,14 @@ tr td{height:17px;font-size:8.5pt}
 .re-cell{text-align:center;font-size:8pt;width:16.75%}
 
 @media print{
+  *{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important}
   @page{size:A4 portrait;margin:0.8cm}
   body{font-size:8pt}
   tr td{height:14px}
+  .weekend .dn,.weekend .da,.weekend .nm{color:#cc0000 !important;font-weight:bold !important}
+  .friday .dn,.friday .da,.friday .nm{background-color:#ffffc0 !important;font-weight:bold !important}
+  .amarela-bg{background-color:#ffffc0 !important}
+  .vermelha-c{color:#cc0000 !important}
 }
 </style>
 <script>window.onload=function(){setTimeout(function(){window.print()},400)}</script>
