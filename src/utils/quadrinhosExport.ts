@@ -84,7 +84,7 @@ export function exportQuadrinhosExcel(soldados: Soldado[], escalas: Escala[]): v
 
 // ─── PDF (PRINT HTML) ────────────────────────────────────────────────────────
 
-function buildTableHtml(tipo: TipoQuadrinho, rows: RowData[], today: string): string {
+function buildTableHtml(tipo: TipoQuadrinho, rows: RowData[], today: string, maxCols: number): string {
   const cfg: Record<TipoQuadrinho, { bg: string; color: string }> = {
     preta:    { bg: '#111827', color: '#fff' },
     amarela:  { bg: '#eab308', color: '#000' },
@@ -92,7 +92,6 @@ function buildTableHtml(tipo: TipoQuadrinho, rows: RowData[], today: string): st
     roxa:     { bg: '#7c3aed', color: '#fff' },
   };
   const c = cfg[tipo];
-  const maxCols = Math.max(...rows.map(r => r.dates.length + r.lastroCount), 5);
 
   const colgroup = `<colgroup><col style="width:125px">${Array(maxCols).fill('<col style="width:60px">').join('')}</colgroup>`;
 
@@ -140,9 +139,11 @@ export function exportQuadrinhosPdf(soldados: Soldado[], escalas: Escala[]): voi
   const dataGeracao = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
   const tipos: TipoQuadrinho[] = ['preta', 'amarela', 'vermelha', 'roxa'];
 
-  const tablesHtml = tipos.map(tipo => {
-    const rows = buildRowData(tipo, soldados, escalas);
-    return buildTableHtml(tipo, rows, today);
+  const allRows = tipos.map(tipo => ({ tipo, rows: buildRowData(tipo, soldados, escalas) }));
+  const globalMaxCols = Math.max(...allRows.flatMap(({ rows }) => rows.map(r => r.dates.length + r.lastroCount)), 5);
+
+  const tablesHtml = allRows.map(({ tipo, rows }) => {
+    return buildTableHtml(tipo, rows, today, globalMaxCols);
   }).join('');
 
   const html = `<!DOCTYPE html>
