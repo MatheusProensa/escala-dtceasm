@@ -69,8 +69,8 @@ export function generatePrintHtml(
   // Posições fixas na coluna direita (índice 1-based)
   const POS_INDISP_HEADER = 1;
   const POS_INDISP_START = 2;
-  const POS_RESERVA_HEADER = 14;
-  const POS_RESERVA_SUB = 15;
+  const POS_RESERVA_BLOCK = 14;  // rowspan=2 covering lines 14 and 15
+  const POS_RESERVA_SKIP = 15;   // covered by rowspan — no td on right side
   const POS_RESERVA_EMPTY = 16;
   const POS_TIPO_HEADER = 17;
   const POS_DATA_START = 18;
@@ -99,10 +99,10 @@ export function generatePrintHtml(
       const solStr = sol ? (sol.patente ? `${sol.patente} ${sol.nome}` : sol.nome) : '(removido)';
       const dStr = `${ddmm(ind.dataInicio)} A ${ddmm(ind.dataFim)}`;
       rightHtml = `<td colspan="4" class="ri-item">${esc(ind.motivo.toUpperCase())}: ${esc(solStr)} (${dStr})</td>`;
-    } else if (D >= POS_RESERVA_HEADER && dayNum === POS_RESERVA_HEADER) {
-      rightHtml = `<td colspan="4" class="re-header">ESCALA DE RESERVA</td>`;
-    } else if (D >= POS_RESERVA_SUB && dayNum === POS_RESERVA_SUB) {
-      rightHtml = `<td colspan="4" class="re-sub">*VERIFICAR INDISPONIBILIDADE*</td>`;
+    } else if (D >= POS_RESERVA_BLOCK && dayNum === POS_RESERVA_BLOCK) {
+      rightHtml = `<td colspan="4" rowspan="2" class="re-block"><div class="re-title">ESCALA DE RESERVA</div><div class="re-sub">*VERIFICAR INDISPONIBILIDADE*</div></td>`;
+    } else if (D >= POS_RESERVA_SKIP && dayNum === POS_RESERVA_SKIP) {
+      rightHtml = ``; // covered by rowspan from line 14
     } else if (D >= POS_RESERVA_EMPTY && dayNum === POS_RESERVA_EMPTY) {
       rightHtml = `<td colspan="4"></td>`;
     } else if (D >= POS_TIPO_HEADER && dayNum === POS_TIPO_HEADER) {
@@ -168,8 +168,9 @@ tr td{height:17px;font-size:8.5pt}
 /* Seção direita */
 .ri-header{font-weight:bold;font-size:8pt;padding-left:6px}
 .ri-item{font-size:8pt;padding-left:6px}
-.re-header{font-weight:bold;text-align:center;font-size:9pt}
-.re-sub{text-align:center;font-size:8pt;font-style:italic}
+.re-block{text-align:center;vertical-align:middle;font-weight:bold}
+.re-block .re-title{font-size:9pt;font-weight:bold;display:block}
+.re-block .re-sub{font-size:8pt;font-style:italic;font-weight:normal;display:block}
 .tipo-h{font-weight:bold;text-align:center;font-size:8pt;width:16.75%}
 .amarela-bg{background-color:#ffffc0}
 .vermelha-c{color:#cc0000}

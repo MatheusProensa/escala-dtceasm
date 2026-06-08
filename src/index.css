@@ -25,6 +25,25 @@
   --q-roxa-text: #ede9fe;
 }
 
+/* Light theme */
+[data-theme="light"] {
+  --bg-primary: #f1f5f9;
+  --bg-surface: #ffffff;
+  --bg-elevated: #f8fafc;
+  --text-primary: #0f172a;
+  --text-secondary: #64748b;
+  --border: #e2e8f0;
+  --border-light: #cbd5e1;
+  --accent: #2563eb;
+  --accent-hover: #1d4ed8;
+}
+
+[data-theme="light"] .alert-warning { color: #92400e; }
+[data-theme="light"] .alert-danger { color: #991b1b; }
+[data-theme="light"] .alert-info { color: #1e40af; }
+[data-theme="light"] tbody tr:hover { background-color: rgba(0,0,0,0.03); }
+[data-theme="light"] .modal { box-shadow: 0 20px 60px rgba(0,0,0,0.15); }
+
 /* ===== Reset ===== */
 *, *::before, *::after {
   box-sizing: border-box;

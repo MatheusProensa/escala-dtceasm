@@ -130,7 +130,10 @@ export default function DatasEspeciais({
               descricao: `Ano Novo ${year}`,
             },
           ]).map(item => {
+            const today = new Date().toISOString().slice(0, 10);
+            const isPast = item.data < today;
             const added = isAlreadyAdded(item.data);
+            if (isPast && !added) return null;
             return (
               <button
                 key={item.data}
@@ -173,7 +176,10 @@ export default function DatasEspeciais({
             </thead>
             <tbody>
               {sorted.map(de => {
-                const isPast = de.data < new Date().toISOString().slice(0, 10);
+                const today = new Date().toISOString().slice(0, 10);
+                const isPast = de.data < today;
+                const added = isAlreadyAdded(de.data);
+                if (isPast && !added) return null;
                 return (
                   <tr key={de.id} style={{ opacity: isPast ? 0.6 : 1 }}>
                     <td style={{ fontFamily: 'monospace' }}>{formatDateBR(de.data)}</td>
