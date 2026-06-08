@@ -169,7 +169,7 @@ export default function Quadrinhos({ soldados, escalas }: QuadrinhosProps) {
               </div>
 
               <div style={{ overflowX: 'auto' }}>
-                <table style={{ borderCollapse: 'collapse', width: '100%', minWidth: 400, tableLayout: 'fixed' }}>
+                <table style={{ borderCollapse: 'collapse', width: 'auto', tableLayout: 'fixed' }}>
                   <colgroup>
                     <col style={{ width: 130 }} />
                     {Array.from({ length: maxCols }, (_, i) => <col key={i} style={{ width: 70 }} />)}
