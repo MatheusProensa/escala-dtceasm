@@ -110,9 +110,19 @@ export default function DatasEspeciais({
         <div className="quick-add-grid">
           {years.flatMap(year => [
             {
+              data: `${year}-12-24`,
+              label: `Véspera Natal ${year}`,
+              descricao: `Véspera de Natal ${year}`,
+            },
+            {
               data: `${year}-12-25`,
               label: `Natal ${year}`,
               descricao: `Natal ${year}`,
+            },
+            {
+              data: `${year}-12-31`,
+              label: `Véspera Ano Novo ${year}`,
+              descricao: `Véspera de Ano Novo ${year}`,
             },
             {
               data: `${year}-01-01`,

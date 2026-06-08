@@ -1,5 +1,6 @@
-import { Users, Calendar, Star, Zap, Archive, CalendarX } from 'lucide-react';
+import { Users, Star, Zap, Archive, CalendarX } from 'lucide-react';
 import type { Tela } from '../types';
+import logoUrl from '../assets/logo-dtceasm.png';
 
 interface SidebarProps {
   currentTela: Tela;
@@ -13,7 +14,7 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { id: 'soldados', label: 'Soldados', icon: <Users size={18} /> },
+  { id: 'soldados', label: 'Militares', icon: <Users size={18} /> },
   { id: 'indisponibilidade', label: 'Indisponibilidade', icon: <CalendarX size={18} /> },
   { id: 'datas-especiais', label: 'Datas Especiais', icon: <Star size={18} /> },
   { id: 'gerar', label: 'Gerar Escala', icon: <Zap size={18} /> },
@@ -24,9 +25,7 @@ export default function Sidebar({ currentTela, onNavigate }: SidebarProps) {
   return (
     <aside className="sidebar">
       <div className="sidebar-brand">
-        <div className="sidebar-brand-icon">
-          <Calendar size={20} color="#fff" />
-        </div>
+        <img src={logoUrl} alt="Logo DTCEA-SM" className="sidebar-brand-logo" />
         <div className="sidebar-brand-text">
           <div className="sidebar-brand-title">DTCEA-SM</div>
           <div className="sidebar-brand-subtitle">Escala de Serviço</div>
@@ -48,8 +47,8 @@ export default function Sidebar({ currentTela, onNavigate }: SidebarProps) {
       </nav>
 
       <div className="sidebar-footer">
-        Destacamento de Controle do<br />
-        Espaço Aéreo de Santa Maria
+        Desenvolvido por Matheus Proensa<br />
+        Ex Cb Proensa · DTCEA-SM
       </div>
     </aside>
   );

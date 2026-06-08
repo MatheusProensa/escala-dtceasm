@@ -77,7 +77,7 @@ export default function Indisponibilidade({
       <div className="page-header">
         <div>
           <div className="page-title">Indisponibilidade</div>
-          <div className="page-subtitle">Períodos em que soldados não podem ser escalados</div>
+          <div className="page-subtitle">Períodos em que militares não podem ser escalados</div>
         </div>
         <button className="btn btn-primary" onClick={openAdd} type="button">
           <Plus size={16} />
@@ -89,7 +89,7 @@ export default function Indisponibilidade({
       {soldados.length > 0 && (
         <div className="flex items-center gap-3 mb-4" style={{ maxWidth: 360 }}>
           <label style={{ marginBottom: 0, whiteSpace: 'nowrap', color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
-            Filtrar por soldado:
+            Filtrar por militar:
           </label>
           <select
             value={filterSoldadoId}

@@ -4,7 +4,7 @@ export interface Soldado {
   id: string;
   nome: string;
   patente: string;
-  ordemAntiguidade: number; // 1 = most junior/modern, higher = more senior
+  ordemAntiguidade: number; // 1 = most senior/antigo, higher = more modern/júnior (higher = preferred for service)
   ativo: boolean;
 }
 
