@@ -8,7 +8,7 @@ interface QuadrinhosProps {
 
 const TIPO_CONFIG: Record<TipoQuadrinho, { label: string; headerBg: string; headerColor: string }> = {
   preta:    { label: 'PRETA',    headerBg: '#111827', headerColor: '#fff' },
-  amarela:  { label: 'AMARELA',  headerBg: '#d97706', headerColor: '#000' },
+  amarela:  { label: 'AMARELA',  headerBg: '#eab308', headerColor: '#000' },
   vermelha: { label: 'VERMELHA', headerBg: '#dc2626', headerColor: '#fff' },
   roxa:     { label: 'ROXA',     headerBg: '#7c3aed', headerColor: '#fff' },
 };

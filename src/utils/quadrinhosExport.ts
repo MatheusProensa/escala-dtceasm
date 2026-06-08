@@ -87,7 +87,7 @@ export function exportQuadrinhosExcel(soldados: Soldado[], escalas: Escala[]): v
 function buildTableHtml(tipo: TipoQuadrinho, rows: RowData[], today: string): string {
   const cfg: Record<TipoQuadrinho, { bg: string; color: string }> = {
     preta:    { bg: '#111827', color: '#fff' },
-    amarela:  { bg: '#d97706', color: '#000' },
+    amarela:  { bg: '#eab308', color: '#000' },
     vermelha: { bg: '#dc2626', color: '#fff' },
     roxa:     { bg: '#7c3aed', color: '#fff' },
   };
