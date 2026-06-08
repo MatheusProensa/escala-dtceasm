@@ -15,10 +15,9 @@ interface SoldadosProps {
 interface FormState {
   nome: string;
   patente: string;
-  ativo: boolean;
 }
 
-const emptyForm: FormState = { nome: '', patente: '', ativo: true };
+const emptyForm: FormState = { nome: '', patente: '' };
 
 export default function Soldados({
   soldados,
@@ -44,7 +43,7 @@ export default function Soldados({
 
   function openEdit(s: Soldado) {
     setEditingId(s.id);
-    setForm({ nome: s.nome, patente: s.patente, ativo: s.ativo });
+    setForm({ nome: s.nome, patente: s.patente });
     setShowModal(true);
   }
 
@@ -59,7 +58,7 @@ export default function Soldados({
     if (!form.nome.trim()) return;
 
     if (editingId) {
-      onUpdate(editingId, { nome: form.nome.trim(), patente: form.patente.trim(), ativo: form.ativo });
+      onUpdate(editingId, { nome: form.nome.trim(), patente: form.patente.trim() });
     } else {
       const maxOrder = soldados.length > 0
         ? Math.max(...soldados.map(s => s.ordemAntiguidade))
@@ -67,7 +66,7 @@ export default function Soldados({
       onAdd({
         nome: form.nome.trim(),
         patente: form.patente.trim(),
-        ativo: form.ativo,
+        ativo: true,
         ordemAntiguidade: maxOrder + 1,
       });
     }
@@ -118,7 +117,6 @@ export default function Soldados({
                 <th>Patente</th>
                 <th>Nome</th>
                 <th>Quadrinhos</th>
-                <th>Ativo</th>
                 <th>Ações</th>
               </tr>
             </thead>
@@ -167,17 +165,6 @@ export default function Soldados({
                         <span className="q-count q-count-vermelha" title="Vermelha">{q.vermelha}</span>
                         <span className="q-count q-count-roxa" title="Roxa">{q.roxa}</span>
                       </div>
-                    </td>
-                    <td>
-                      <label className="toggle" title={s.ativo ? 'Ativo' : 'Inativo'}>
-                        <input
-                          type="checkbox"
-                          checked={s.ativo}
-                          onChange={(e) => onUpdate(s.id, { ativo: e.target.checked })}
-                        />
-                        <span className="toggle-track" />
-                        <span className="toggle-thumb" />
-                      </label>
                     </td>
                     <td>
                       <div className="flex items-center gap-2">
@@ -273,20 +260,6 @@ export default function Soldados({
                     onChange={e => setForm(f => ({ ...f, patente: e.target.value }))}
                     placeholder="Ex: Sd, Cb, 3Sgt..."
                   />
-                </div>
-                <div className="form-group">
-                  <div className="toggle-wrapper">
-                    <label className="toggle" style={{ marginBottom: 0 }}>
-                      <input
-                        type="checkbox"
-                        checked={form.ativo}
-                        onChange={e => setForm(f => ({ ...f, ativo: e.target.checked }))}
-                      />
-                      <span className="toggle-track" />
-                      <span className="toggle-thumb" />
-                    </label>
-                    <span style={{ fontSize: '0.875rem', color: 'var(--text-primary)' }}>Ativo</span>
-                  </div>
                 </div>
                 {!editingId && (
                   <div className="alert alert-info text-xs">

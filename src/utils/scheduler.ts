@@ -152,19 +152,26 @@ export function gerarEscala(
       continue;
     }
 
-    // Regra 24h: militar não pode servir em dias consecutivos (diff >= 2).
-    // 48h de intervalo é PERMITIDO — aplica para todos os tipos.
-    // Prioridade de tipo: roxa > vermelha > amarela > preta (cada dia já seleciona
-    // quem tem menos daquele tipo, garantindo o balanceamento por prioridade).
-    const withInterval = available.filter(s => {
-      const lastService = getLastServiceDate(s.id, dateStr, history, generated);
-      if (!lastService) return true;
-      const diff = dayDiff(lastService, dateStr);
-      return diff >= 2; // mínimo 1 dia de folga entre serviços
+    // Regra de intervalo:
+    //   - Preferido: >= 2 dias de folga (diff >= 3)  → pool principal
+    //   - Permitido: 1 dia de folga (diff >= 2 / 48h) → só se pool principal vazio
+    //   - Proibido: dias consecutivos (diff < 2)      → último recurso, marca exceção
+    const withGoodRest = available.filter(s => {
+      const last = getLastServiceDate(s.id, dateStr, history, generated);
+      if (!last) return true;
+      return dayDiff(last, dateStr) >= 3;
     });
 
-    const candidatos = withInterval.length > 0 ? withInterval : available;
-    const excepcionouIntervalo = withInterval.length === 0 && available.length > 0;
+    const withMinRest = available.filter(s => {
+      const last = getLastServiceDate(s.id, dateStr, history, generated);
+      if (!last) return true;
+      return dayDiff(last, dateStr) >= 2;
+    });
+
+    const candidatos = withGoodRest.length > 0 ? withGoodRest
+      : withMinRest.length > 0 ? withMinRest
+      : available;
+    const excepcionouIntervalo = withMinRest.length === 0 && available.length > 0;
 
     // Sort: fewer quadrinhos of this tipo first, then more junior (lower ordemAntiguidade) first
     const sorted = [...candidatos].sort((a, b) => {
