@@ -152,10 +152,9 @@ export default function Quadrinhos({ soldados, escalas }: QuadrinhosProps) {
                               fontWeight: 600,
                               border: '1px solid rgba(0,0,0,0.15)',
                               minWidth: 64,
-                              backgroundColor: hasEntry ? cfg.cellBg : 'transparent',
+                              backgroundColor: !hasEntry ? 'transparent' : isLastro ? '#94a3b8' : cfg.cellBg,
                               color: hasEntry ? '#fff' : 'transparent',
                               fontStyle: isLastro ? 'italic' : 'normal',
-                              opacity: isLastro ? 0.75 : 1,
                             }}>
                               {entry ?? ''}
                             </td>
@@ -168,10 +167,14 @@ export default function Quadrinhos({ soldados, escalas }: QuadrinhosProps) {
               </div>
 
               {/* Legend */}
-              <div style={{ padding: '0.4rem 0.75rem', fontSize: '0.7rem', color: 'var(--text-secondary)', borderTop: '1px solid var(--border)' }}>
+              <div style={{ padding: '0.4rem 0.75rem', fontSize: '0.7rem', color: 'var(--text-secondary)', borderTop: '1px solid var(--border)', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                  <span style={{ background: cfg.cellBg, width: 10, height: 10, borderRadius: 2, display: 'inline-block', opacity: 0.75 }} />
-                  LASTRO = crédito por defasagem de 2+ colunas em relação a todos os militares
+                  <span style={{ background: cfg.cellBg, width: 10, height: 10, borderRadius: 2, display: 'inline-block' }} />
+                  Serviço realizado
+                </span>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                  <span style={{ background: '#94a3b8', width: 10, height: 10, borderRadius: 2, display: 'inline-block' }} />
+                  LASTRO — crédito por 2+ colunas de defasagem em relação a todos
                 </span>
               </div>
             </div>
