@@ -150,7 +150,7 @@ td{border:1px solid #000;vertical-align:middle;padding:2px 4px}
 .h-logo{font-size:11pt;font-weight:bold;text-align:center;vertical-align:middle}
 .h-mes-label{text-align:center;font-size:8pt;color:#333;vertical-align:middle}
 .h-mes{font-size:14pt;font-weight:bold;text-align:center;vertical-align:middle}
-.h-orgao{font-size:7.5pt;text-align:center;vertical-align:middle}
+.h-orgao{font-size:7pt;text-align:center;vertical-align:middle;line-height:1.3}
 .h-rl{font-size:7pt;color:#333;text-align:center;vertical-align:bottom;padding-bottom:2px}
 .h-rv{font-size:10pt;font-weight:bold;text-align:center;vertical-align:top;padding-top:2px}
 
@@ -201,7 +201,7 @@ tr td{height:17px;font-size:8.5pt}
     <td class="h-rv">${esc(escalante)}</td>
   </tr>
   <tr>
-    <td rowspan="2" class="h-orgao">ÓRGÃO<br><strong>PERMANÊNCIA DTCEA-SM</strong></td>
+    <td rowspan="2" class="h-orgao">ÓRGÃO<br><strong>PERMANÊNCIA<br>DTCEA-SM</strong></td>
     <td rowspan="2" class="h-mes">${esc(mesAno)}</td>
     <td class="h-rl">COMANDANTE DO DTCEA-SM</td>
   </tr>
