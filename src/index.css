@@ -81,6 +81,21 @@
   border-color: var(--border);
   color: var(--text-primary);
 }
+/* Override Chrome autofill background — dark theme */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px var(--bg-elevated) inset !important;
+  -webkit-text-fill-color: var(--text-primary) !important;
+  caret-color: var(--text-primary);
+}
+/* Override Chrome autofill background — light theme */
+[data-theme="light"] input:-webkit-autofill,
+[data-theme="light"] input:-webkit-autofill:hover,
+[data-theme="light"] input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
+  -webkit-text-fill-color: var(--text-primary) !important;
+}
 [data-theme="light"] thead { background-color: #dde6f0; }
 [data-theme="light"] th { color: #2d3748; }
 [data-theme="light"] .badge-preta { border-color: #4a5568; }
