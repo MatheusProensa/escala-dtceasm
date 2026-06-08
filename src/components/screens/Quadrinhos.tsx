@@ -148,11 +148,13 @@ export default function Quadrinhos({ soldados, escalas }: QuadrinhosProps) {
         </div>
       </div>
 
+      {(() => {
+        const allRows = tipos.map(tipo => ({ tipo, cfg: TIPO_CONFIG[tipo], rows: buildRows(tipo, soldados, escalas) }));
+        const globalMaxCols = Math.max(...allRows.flatMap(({ rows }) => rows.map(r => r.total)), 5);
+        return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-        {tipos.map(tipo => {
-          const cfg = TIPO_CONFIG[tipo];
-          const rows = buildRows(tipo, soldados, escalas);
-          const maxCols = Math.max(...rows.map(r => r.total), 5);
+        {allRows.map(({ tipo, cfg, rows }) => {
+          const maxCols = globalMaxCols;
 
           return (
             <div key={tipo} className="card" style={{ padding: 0, overflow: 'hidden' }}>
@@ -224,6 +226,8 @@ export default function Quadrinhos({ soldados, escalas }: QuadrinhosProps) {
           );
         })}
       </div>
+        );
+      })()}
     </div>
   );
 }
