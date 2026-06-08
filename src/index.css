@@ -71,12 +71,15 @@
 [data-theme="light"] .modal { box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
 [data-theme="light"] .sidebar-nav-item.active { background-color: rgba(29, 78, 216, 0.12); }
 [data-theme="light"] input[type="text"],
+[data-theme="light"] input[type="email"],
+[data-theme="light"] input[type="password"],
 [data-theme="light"] input[type="date"],
 [data-theme="light"] input[type="number"],
 [data-theme="light"] select,
 [data-theme="light"] textarea {
   background-color: #ffffff;
   border-color: var(--border);
+  color: var(--text-primary);
 }
 [data-theme="light"] thead { background-color: #dde6f0; }
 [data-theme="light"] th { color: #2d3748; }
