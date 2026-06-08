@@ -87,12 +87,12 @@ export default function Soldados({
     <div>
       <div className="page-header">
         <div>
-          <div className="page-title">Gerenciar Soldados</div>
-          <div className="page-subtitle">{soldados.length} soldado(s) cadastrado(s)</div>
+          <div className="page-title">Gerenciar Militares</div>
+          <div className="page-subtitle">{soldados.length} militar(es) cadastrado(s)</div>
         </div>
         <button className="btn btn-primary" onClick={openAdd} type="button">
           <Plus size={16} />
-          Novo Soldado
+          Novo Militar
         </button>
       </div>
 
@@ -106,8 +106,8 @@ export default function Soldados({
               <path d="M16 3.13a4 4 0 0 1 0 7.75" />
             </svg>
           </div>
-          <div className="empty-state-text">Nenhum soldado cadastrado</div>
-          <div className="empty-state-sub">Clique em "Novo Soldado" para começar</div>
+          <div className="empty-state-text">Nenhum militar cadastrado</div>
+          <div className="empty-state-sub">Clique em "Novo Militar" para começar</div>
         </div>
       ) : (
         <div className="table-wrapper">
@@ -244,7 +244,7 @@ export default function Soldados({
           <div className="modal" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
               <span className="modal-title">
-                {editingId ? 'Editar Soldado' : 'Novo Soldado'}
+                {editingId ? 'Editar Militar' : 'Novo Militar'}
               </span>
               <button className="btn-icon" onClick={closeModal} type="button">
                 <X size={16} />
@@ -290,7 +290,7 @@ export default function Soldados({
                 </div>
                 {!editingId && (
                   <div className="alert alert-info text-xs">
-                    O soldado será adicionado como o mais antigo (maior ordem). Use os botões ↑↓ para reordenar.
+                    O militar será adicionado como o mais moderno (menor prioridade na escala). Use os botões ↑↓ para reordenar.
                   </div>
                 )}
               </div>

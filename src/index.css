@@ -84,14 +84,10 @@ body {
   gap: 0.625rem;
 }
 
-.sidebar-brand-icon {
-  width: 36px;
-  height: 36px;
-  background: var(--accent);
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.sidebar-brand-logo {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
   flex-shrink: 0;
 }
 

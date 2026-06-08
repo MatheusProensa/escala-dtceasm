@@ -105,7 +105,7 @@ export default function GerarEscala({
       {activeSoldados.length === 0 && (
         <div className="alert alert-warning mb-4">
           <AlertTriangle size={16} />
-          Não há soldados ativos cadastrados. Adicione soldados antes de gerar a escala.
+          Não há militares ativos cadastrados. Adicione militares antes de gerar a escala.
         </div>
       )}
 

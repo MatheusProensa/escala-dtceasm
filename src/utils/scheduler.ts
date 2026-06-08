@@ -172,8 +172,8 @@ export function gerarEscala(
 
       if (countA !== countB) return countA - countB; // fewer quadrinhos first
 
-      // Tie-breaker: most junior (lower ordemAntiguidade) first
-      return a.ordemAntiguidade - b.ordemAntiguidade;
+      // Tie-breaker: most modern (higher ordemAntiguidade) first
+      return b.ordemAntiguidade - a.ordemAntiguidade;
     });
 
     const chosen = sorted[0];

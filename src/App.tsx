@@ -11,7 +11,7 @@ import GerarEscala from './components/screens/GerarEscala';
 import Historico from './components/screens/Historico';
 
 const telaLabels: Record<Tela, string> = {
-  soldados: 'Soldados',
+  soldados: 'Militares',
   indisponibilidade: 'Indisponibilidade',
   'datas-especiais': 'Datas Especiais',
   gerar: 'Gerar Escala',
@@ -68,6 +68,7 @@ export default function App() {
           <Historico
             soldados={appData.data.soldados}
             escalas={appData.data.escalas}
+            indisponibilidades={appData.data.indisponibilidades}
             onDelete={appData.deleteEscala}
           />
         );

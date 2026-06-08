@@ -1,16 +1,21 @@
 import { useState } from 'react';
-import { Archive, Eye, Trash2, ArrowLeft, Printer, AlertTriangle } from 'lucide-react';
-import type { Soldado, Escala } from '../../types';
+import { Archive, Eye, Trash2, ArrowLeft, FileDown, AlertTriangle, X } from 'lucide-react';
+import type { Soldado, Escala, Indisponibilidade } from '../../types';
 import { formatDateBR, getDayName } from '../../utils/dateUtils';
 import { computeQuadrinhosFromDias } from '../../utils/scheduler';
+import { generatePrintHtml } from '../../utils/printHtml';
 
 interface HistoricoProps {
   soldados: Soldado[];
   escalas: Escala[];
+  indisponibilidades: Indisponibilidade[];
   onDelete: (id: string) => void;
 }
 
 type TipoQuadrinho = 'preta' | 'amarela' | 'vermelha' | 'roxa';
+
+const SETTINGS_KEY_ESCALANTE = 'escala-dtceasm-escalante';
+const SETTINGS_KEY_COMANDANTE = 'escala-dtceasm-comandante';
 
 function tipoLabel(tipo: TipoQuadrinho): string {
   switch (tipo) {
@@ -43,18 +48,57 @@ function formatDateTime(isoStr: string): string {
   }
 }
 
-export default function Historico({ soldados, escalas, onDelete }: HistoricoProps) {
+interface ExportModal {
+  escalaId: string;
+  escalante: string;
+  comandante: string;
+}
+
+export default function Historico({ soldados, escalas, indisponibilidades, onDelete }: HistoricoProps) {
   const [viewingId, setViewingId] = useState<string | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [exportModal, setExportModal] = useState<ExportModal | null>(null);
 
   const sorted = [...escalas].sort((a, b) => b.geradaEm.localeCompare(a.geradaEm));
-
   const viewingEscala = viewingId ? escalas.find(e => e.id === viewingId) ?? null : null;
 
   function handleDelete(id: string) {
     if (viewingId === id) setViewingId(null);
     onDelete(id);
     setDeleteConfirmId(null);
+  }
+
+  function openExportModal(escalaId: string) {
+    setExportModal({
+      escalaId,
+      escalante: localStorage.getItem(SETTINGS_KEY_ESCALANTE) ?? '',
+      comandante: localStorage.getItem(SETTINGS_KEY_COMANDANTE) ?? '',
+    });
+  }
+
+  function handleExport() {
+    if (!exportModal) return;
+    const escala = escalas.find(e => e.id === exportModal.escalaId);
+    if (!escala) return;
+
+    localStorage.setItem(SETTINGS_KEY_ESCALANTE, exportModal.escalante);
+    localStorage.setItem(SETTINGS_KEY_COMANDANTE, exportModal.comandante);
+
+    const html = generatePrintHtml(
+      escala,
+      soldados,
+      indisponibilidades,
+      escalas,
+      exportModal.escalante,
+      exportModal.comandante,
+    );
+
+    const w = window.open('', '_blank');
+    if (w) {
+      w.document.write(html);
+      w.document.close();
+    }
+    setExportModal(null);
   }
 
   if (viewingEscala) {
@@ -67,19 +111,8 @@ export default function Historico({ soldados, escalas, onDelete }: HistoricoProp
 
     return (
       <div>
-        {/* Print header - only visible in print */}
-        <div className="print-only print-header">
-          <h1>MINISTÉRIO DA DEFESA / COMANDO DA AERONÁUTICA</h1>
-          <h1>DESTACAMENTO DE CONTROLE DO ESPAÇO AÉREO DE SANTA MARIA</h1>
-          <h2>ESCALA DE SERVIÇO</h2>
-          <p>
-            {viewingEscala.nome} &mdash; Período: {formatDateBR(viewingEscala.periodo.inicio)} a {formatDateBR(viewingEscala.periodo.fim)}
-          </p>
-          <p>Gerada em: {formatDateTime(viewingEscala.geradaEm)}</p>
-        </div>
-
         {/* Screen header */}
-        <div className="page-header no-print">
+        <div className="page-header">
           <div className="flex items-center gap-3">
             <button
               className="btn btn-ghost"
@@ -99,21 +132,21 @@ export default function Historico({ soldados, escalas, onDelete }: HistoricoProp
           </div>
           <button
             className="btn btn-primary"
-            onClick={() => window.print()}
+            onClick={() => openExportModal(viewingEscala.id)}
             type="button"
           >
-            <Printer size={16} />
-            Imprimir / Exportar PDF
+            <FileDown size={16} />
+            Exportar PDF (Modelo Oficial)
           </button>
         </div>
 
         {/* Warnings */}
         {(nullDays.length > 0 || exceptions.length > 0) && (
-          <div className="no-print" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1rem' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1rem' }}>
             {nullDays.length > 0 && (
               <div className="alert alert-danger">
                 <AlertTriangle size={16} style={{ flexShrink: 0 }} />
-                <span><strong>{nullDays.length} dia(s) sem soldado disponível:</strong> {nullDays.map(d => formatDateBR(d.data)).join(', ')}</span>
+                <span><strong>{nullDays.length} dia(s) sem militar disponível:</strong> {nullDays.map(d => formatDateBR(d.data)).join(', ')}</span>
               </div>
             )}
             {exceptions.length > 0 && (
@@ -126,52 +159,50 @@ export default function Historico({ soldados, escalas, onDelete }: HistoricoProp
         )}
 
         {/* Table */}
-        <div className="print-table-wrapper">
-          <div className="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>Data</th>
-                  <th>Dia</th>
-                  <th>Tipo</th>
-                  <th>Soldado</th>
-                  <th className="no-print" title="Observações">Obs</th>
-                </tr>
-              </thead>
-              <tbody>
-                {viewingEscala.dias.map(dia => (
-                  <tr key={dia.data} className={dia.excepcionouIntervalo ? 'exception-row' : ''}>
-                    <td style={{ fontFamily: 'monospace' }}>{formatDateBR(dia.data)}</td>
-                    <td className="text-secondary">{getDayName(dia.data)}</td>
-                    <td>
-                      <span className={`badge badge-${dia.tipoQuadrinho}`}>
-                        {tipoLabel(dia.tipoQuadrinho)}
+        <div className="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Dia</th>
+                <th>Tipo</th>
+                <th>Militar</th>
+                <th title="Observações">Obs</th>
+              </tr>
+            </thead>
+            <tbody>
+              {viewingEscala.dias.map(dia => (
+                <tr key={dia.data} className={dia.excepcionouIntervalo ? 'exception-row' : ''}>
+                  <td style={{ fontFamily: 'monospace' }}>{formatDateBR(dia.data)}</td>
+                  <td className="text-secondary">{getDayName(dia.data)}</td>
+                  <td>
+                    <span className={`badge badge-${dia.tipoQuadrinho}`}>
+                      {tipoLabel(dia.tipoQuadrinho)}
+                    </span>
+                  </td>
+                  <td>
+                    {dia.soldadoId ? (
+                      <span style={{ fontWeight: 500 }}>{getSoldadoLabel(soldados, dia.soldadoId)}</span>
+                    ) : (
+                      <span className="text-danger" style={{ fontWeight: 500 }}>SEM MILITAR</span>
+                    )}
+                  </td>
+                  <td>
+                    {dia.excepcionouIntervalo && (
+                      <span title="Regra de 48h excepcionada" style={{ color: 'var(--warning)' }}>
+                        <AlertTriangle size={14} />
                       </span>
-                    </td>
-                    <td>
-                      {dia.soldadoId ? (
-                        <span style={{ fontWeight: 500 }}>{getSoldadoLabel(soldados, dia.soldadoId)}</span>
-                      ) : (
-                        <span className="text-danger" style={{ fontWeight: 500 }}>SEM SOLDADO</span>
-                      )}
-                    </td>
-                    <td className="no-print">
-                      {dia.excepcionouIntervalo && (
-                        <span title="Regra de 48h excepcionada" style={{ color: 'var(--warning)' }}>
-                          <AlertTriangle size={14} />
-                        </span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
 
         {/* Soldado Summary */}
         {Object.keys(q).length > 0 && (
-          <div className="card mt-4 no-print">
+          <div className="card mt-4">
             <div className="card-title mb-2" style={{ fontSize: '0.875rem' }}>Quadrinhos Nesta Escala</div>
             <div className="summary-grid">
               {activeSoldados.map(s => {
@@ -195,6 +226,16 @@ export default function Historico({ soldados, escalas, onDelete }: HistoricoProp
               })}
             </div>
           </div>
+        )}
+
+        {/* Export Modal */}
+        {exportModal && exportModal.escalaId === viewingEscala.id && (
+          <ExportPdfModal
+            modal={exportModal}
+            onChange={setExportModal}
+            onConfirm={handleExport}
+            onClose={() => setExportModal(null)}
+          />
         )}
       </div>
     );
@@ -240,12 +281,20 @@ export default function Historico({ soldados, escalas, onDelete }: HistoricoProp
                     )}
                     {nullDays > 0 && (
                       <span style={{ color: 'var(--danger)', marginLeft: '0.5rem' }}>
-                        {nullDays} sem soldado
+                        {nullDays} sem militar
                       </span>
                     )}
                   </div>
                 </div>
                 <div className="escala-list-item-actions">
+                  <button
+                    className="btn btn-ghost btn-sm"
+                    onClick={() => openExportModal(escala.id)}
+                    type="button"
+                  >
+                    <FileDown size={14} />
+                    PDF
+                  </button>
                   <button
                     className="btn btn-ghost btn-sm"
                     onClick={() => setViewingId(escala.id)}
@@ -288,6 +337,78 @@ export default function Historico({ soldados, escalas, onDelete }: HistoricoProp
           })}
         </div>
       )}
+
+      {/* Export Modal (from list view) */}
+      {exportModal && !viewingId && (
+        <ExportPdfModal
+          modal={exportModal}
+          onChange={setExportModal}
+          onConfirm={handleExport}
+          onClose={() => setExportModal(null)}
+        />
+      )}
+    </div>
+  );
+}
+
+interface ExportPdfModalProps {
+  modal: ExportModal;
+  onChange: (m: ExportModal) => void;
+  onConfirm: () => void;
+  onClose: () => void;
+}
+
+function ExportPdfModal({ modal, onChange, onConfirm, onClose }: ExportPdfModalProps) {
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" onClick={e => e.stopPropagation()}>
+        <div className="modal-header">
+          <span className="modal-title">Exportar PDF — Modelo Oficial</span>
+          <button className="btn-icon" onClick={onClose} type="button">
+            <X size={16} />
+          </button>
+        </div>
+        <div className="modal-body">
+          <div className="form-group">
+            <label htmlFor="exp-escalante">Escalante (nome e posto)</label>
+            <input
+              id="exp-escalante"
+              type="text"
+              value={modal.escalante}
+              onChange={e => onChange({ ...modal, escalante: e.target.value })}
+              placeholder="Ex: RODRIGO ZIMMERMANN CB SAD"
+              autoFocus
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="exp-comandante">Comandante do DTCEA-SM (nome e posto)</label>
+            <input
+              id="exp-comandante"
+              type="text"
+              value={modal.comandante}
+              onChange={e => onChange({ ...modal, comandante: e.target.value })}
+              placeholder="Ex: REINALDO FERRAZ DE OLIVEIRA CASTILHA MAJ AV"
+            />
+          </div>
+          <div className="alert alert-info" style={{ fontSize: '0.8rem' }}>
+            Uma nova aba será aberta com o modelo oficial. Use <strong>Ctrl+P → Salvar como PDF</strong> para exportar.
+          </div>
+        </div>
+        <div className="modal-footer">
+          <button className="btn btn-ghost" onClick={onClose} type="button">
+            Cancelar
+          </button>
+          <button
+            className="btn btn-primary"
+            onClick={onConfirm}
+            type="button"
+            disabled={!modal.escalante.trim() || !modal.comandante.trim()}
+          >
+            <FileDown size={16} />
+            Gerar PDF
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
