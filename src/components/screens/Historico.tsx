@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Archive, Eye, Trash2, ArrowLeft, FileDown, AlertTriangle, X } from 'lucide-react';
+import { Archive, Eye, Trash2, ArrowLeft, FileDown, AlertTriangle } from 'lucide-react';
 import type { Soldado, Escala, Indisponibilidade } from '../../types';
 import { formatDateBR, getDayName } from '../../utils/dateUtils';
 import { computeQuadrinhosFromDias } from '../../utils/scheduler';
@@ -10,12 +10,11 @@ interface HistoricoProps {
   escalas: Escala[];
   indisponibilidades: Indisponibilidade[];
   onDelete: (id: string) => void;
+  escalante: string;
+  comandante: string;
 }
 
 type TipoQuadrinho = 'preta' | 'amarela' | 'vermelha' | 'roxa';
-
-const SETTINGS_KEY_ESCALANTE = 'escala-dtceasm-escalante';
-const SETTINGS_KEY_COMANDANTE = 'escala-dtceasm-comandante';
 
 function tipoLabel(tipo: TipoQuadrinho): string {
   switch (tipo) {
@@ -48,19 +47,14 @@ function formatDateTime(isoStr: string): string {
   }
 }
 
-interface ExportModal {
-  escalaId: string;
-  escalante: string;
-  comandante: string;
-}
-
-export default function Historico({ soldados, escalas, indisponibilidades, onDelete }: HistoricoProps) {
+export default function Historico({ soldados, escalas, indisponibilidades, onDelete, escalante, comandante }: HistoricoProps) {
   const [viewingId, setViewingId] = useState<string | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
-  const [exportModal, setExportModal] = useState<ExportModal | null>(null);
 
   const sorted = [...escalas].sort((a, b) => b.geradaEm.localeCompare(a.geradaEm));
   const viewingEscala = viewingId ? escalas.find(e => e.id === viewingId) ?? null : null;
+
+  const missingConfig = !escalante.trim() || !comandante.trim();
 
   function handleDelete(id: string) {
     if (viewingId === id) setViewingId(null);
@@ -68,29 +62,14 @@ export default function Historico({ soldados, escalas, indisponibilidades, onDel
     setDeleteConfirmId(null);
   }
 
-  function openExportModal(escalaId: string) {
-    setExportModal({
-      escalaId,
-      escalante: localStorage.getItem(SETTINGS_KEY_ESCALANTE) ?? '',
-      comandante: localStorage.getItem(SETTINGS_KEY_COMANDANTE) ?? '',
-    });
-  }
-
-  function handleExport() {
-    if (!exportModal) return;
-    const escala = escalas.find(e => e.id === exportModal.escalaId);
-    if (!escala) return;
-
-    localStorage.setItem(SETTINGS_KEY_ESCALANTE, exportModal.escalante);
-    localStorage.setItem(SETTINGS_KEY_COMANDANTE, exportModal.comandante);
-
+  function handleExport(escala: Escala) {
     const html = generatePrintHtml(
       escala,
       soldados,
       indisponibilidades,
       escalas,
-      exportModal.escalante,
-      exportModal.comandante,
+      escalante,
+      comandante,
     );
 
     const w = window.open('', '_blank');
@@ -98,7 +77,6 @@ export default function Historico({ soldados, escalas, indisponibilidades, onDel
       w.document.write(html);
       w.document.close();
     }
-    setExportModal(null);
   }
 
   if (viewingEscala) {
@@ -132,13 +110,23 @@ export default function Historico({ soldados, escalas, indisponibilidades, onDel
           </div>
           <button
             className="btn btn-primary"
-            onClick={() => openExportModal(viewingEscala.id)}
+            onClick={() => handleExport(viewingEscala)}
             type="button"
+            disabled={missingConfig}
+            title={missingConfig ? 'Configure o escalante e comandante em Configurações' : 'Exportar PDF'}
           >
             <FileDown size={16} />
             Exportar PDF (Modelo Oficial)
           </button>
         </div>
+
+        {/* Missing config warning */}
+        {missingConfig && (
+          <div className="alert alert-warning" style={{ marginBottom: '1rem' }}>
+            <AlertTriangle size={16} style={{ flexShrink: 0 }} />
+            <span>Configure o escalante e o comandante em <strong>Configurações</strong> antes de exportar o PDF.</span>
+          </div>
+        )}
 
         {/* Warnings */}
         {(nullDays.length > 0 || exceptions.length > 0) && (
@@ -227,16 +215,6 @@ export default function Historico({ soldados, escalas, indisponibilidades, onDel
             </div>
           </div>
         )}
-
-        {/* Export Modal */}
-        {exportModal && exportModal.escalaId === viewingEscala.id && (
-          <ExportPdfModal
-            modal={exportModal}
-            onChange={setExportModal}
-            onConfirm={handleExport}
-            onClose={() => setExportModal(null)}
-          />
-        )}
       </div>
     );
   }
@@ -249,6 +227,14 @@ export default function Historico({ soldados, escalas, indisponibilidades, onDel
           <div className="page-subtitle">{escalas.length} escala(s) salva(s)</div>
         </div>
       </div>
+
+      {/* Missing config warning */}
+      {missingConfig && escalas.length > 0 && (
+        <div className="alert alert-warning" style={{ marginBottom: '1rem' }}>
+          <AlertTriangle size={16} style={{ flexShrink: 0 }} />
+          <span>Configure o escalante e o comandante em <strong>Configurações</strong> antes de exportar o PDF.</span>
+        </div>
+      )}
 
       {escalas.length === 0 ? (
         <div className="empty-state">
@@ -289,8 +275,10 @@ export default function Historico({ soldados, escalas, indisponibilidades, onDel
                 <div className="escala-list-item-actions">
                   <button
                     className="btn btn-ghost btn-sm"
-                    onClick={() => openExportModal(escala.id)}
+                    onClick={() => handleExport(escala)}
                     type="button"
+                    disabled={missingConfig}
+                    title={missingConfig ? 'Configure o escalante e comandante em Configurações' : 'Exportar PDF'}
                   >
                     <FileDown size={14} />
                     PDF
@@ -337,78 +325,6 @@ export default function Historico({ soldados, escalas, indisponibilidades, onDel
           })}
         </div>
       )}
-
-      {/* Export Modal (from list view) */}
-      {exportModal && !viewingId && (
-        <ExportPdfModal
-          modal={exportModal}
-          onChange={setExportModal}
-          onConfirm={handleExport}
-          onClose={() => setExportModal(null)}
-        />
-      )}
-    </div>
-  );
-}
-
-interface ExportPdfModalProps {
-  modal: ExportModal;
-  onChange: (m: ExportModal) => void;
-  onConfirm: () => void;
-  onClose: () => void;
-}
-
-function ExportPdfModal({ modal, onChange, onConfirm, onClose }: ExportPdfModalProps) {
-  return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal" onClick={e => e.stopPropagation()}>
-        <div className="modal-header">
-          <span className="modal-title">Exportar PDF — Modelo Oficial</span>
-          <button className="btn-icon" onClick={onClose} type="button">
-            <X size={16} />
-          </button>
-        </div>
-        <div className="modal-body">
-          <div className="form-group">
-            <label htmlFor="exp-escalante">Escalante (nome e posto)</label>
-            <input
-              id="exp-escalante"
-              type="text"
-              value={modal.escalante}
-              onChange={e => onChange({ ...modal, escalante: e.target.value })}
-              placeholder="Ex: RODRIGO ZIMMERMANN CB SAD"
-              autoFocus
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="exp-comandante">Comandante do DTCEA-SM (nome e posto)</label>
-            <input
-              id="exp-comandante"
-              type="text"
-              value={modal.comandante}
-              onChange={e => onChange({ ...modal, comandante: e.target.value })}
-              placeholder="Ex: REINALDO FERRAZ DE OLIVEIRA CASTILHA MAJ AV"
-            />
-          </div>
-          <div className="alert alert-info" style={{ fontSize: '0.8rem' }}>
-            Uma nova aba será aberta com o modelo oficial. Use <strong>Ctrl+P → Salvar como PDF</strong> para exportar.
-          </div>
-        </div>
-        <div className="modal-footer">
-          <button className="btn btn-ghost" onClick={onClose} type="button">
-            Cancelar
-          </button>
-          <button
-            className="btn btn-primary"
-            onClick={onConfirm}
-            type="button"
-            disabled={!modal.escalante.trim() || !modal.comandante.trim()}
-          >
-            <FileDown size={16} />
-            Gerar PDF
-          </button>
-        </div>
-      </div>
     </div>
   );
 }

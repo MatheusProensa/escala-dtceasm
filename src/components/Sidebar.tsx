@@ -1,4 +1,4 @@
-import { Users, Star, Zap, Archive, CalendarX } from 'lucide-react';
+import { Users, Star, Zap, Archive, CalendarX, Settings } from 'lucide-react';
 import type { Tela } from '../types';
 import logoUrl from '../assets/logo-dtceasm.png';
 
@@ -19,6 +19,7 @@ const navItems: NavItem[] = [
   { id: 'datas-especiais', label: 'Datas Especiais', icon: <Star size={18} /> },
   { id: 'gerar', label: 'Gerar Escala', icon: <Zap size={18} /> },
   { id: 'historico', label: 'Histórico', icon: <Archive size={18} /> },
+  { id: 'configuracoes', label: 'Configurações', icon: <Settings size={18} /> },
 ];
 
 export default function Sidebar({ currentTela, onNavigate }: SidebarProps) {
