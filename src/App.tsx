@@ -5,6 +5,8 @@ import { useSettings } from './hooks/useSettings';
 import Layout from './components/Layout';
 import Sidebar from './components/Sidebar';
 import Topbar from './components/Topbar';
+import Login from './components/screens/Login';
+import Dashboard from './components/screens/Dashboard';
 import Soldados from './components/screens/Soldados';
 import Indisponibilidade from './components/screens/Indisponibilidade';
 import DatasEspeciais from './components/screens/DatasEspeciais';
@@ -13,6 +15,7 @@ import Historico from './components/screens/Historico';
 import Configuracoes from './components/screens/Configuracoes';
 
 const telaLabels: Record<Tela, string> = {
+  dashboard: 'Início',
   soldados: 'Militares',
   indisponibilidade: 'Indisponibilidade',
   'datas-especiais': 'Datas Especiais',
@@ -22,12 +25,38 @@ const telaLabels: Record<Tela, string> = {
 };
 
 export default function App() {
-  const [currentTela, setCurrentTela] = useState<Tela>('soldados');
+  const [currentTela, setCurrentTela] = useState<Tela>('dashboard');
   const appData = useAppData();
   const settings = useSettings();
 
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    () => !localStorage.getItem('escala-dtceasm-password')
+  );
+
+  function handleLogin(password: string): boolean {
+    const ok = settings.checkPassword(password);
+    if (ok) setIsAuthenticated(true);
+    return ok;
+  }
+
+  function handleLogout() {
+    setIsAuthenticated(false);
+    setCurrentTela('dashboard');
+  }
+
+  if (!isAuthenticated) {
+    return <Login onLogin={handleLogin} />;
+  }
+
   function renderTela() {
     switch (currentTela) {
+      case 'dashboard':
+        return (
+          <Dashboard
+            data={appData.data}
+            onNavigate={setCurrentTela}
+          />
+        );
       case 'soldados':
         return (
           <Soldados
@@ -84,8 +113,11 @@ export default function App() {
             escalante={settings.escalante}
             comandante={settings.comandante}
             theme={settings.theme}
+            hasPassword={settings.hasPassword}
             onSave={(e, c) => { settings.setEscalante(e); settings.setComandante(c); }}
             onToggleTheme={settings.toggleTheme}
+            onSetPassword={settings.setPassword}
+            onLogout={handleLogout}
           />
         );
     }

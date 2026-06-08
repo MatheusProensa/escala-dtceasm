@@ -1,4 +1,4 @@
-import { Users, Star, Zap, Archive, CalendarX, Settings } from 'lucide-react';
+import { Home, Users, Star, Zap, Archive, CalendarX, Settings } from 'lucide-react';
 import type { Tela } from '../types';
 import logoUrl from '../assets/logo-dtceasm.png';
 
@@ -14,6 +14,7 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
+  { id: 'dashboard', label: 'Início', icon: <Home size={18} /> },
   { id: 'soldados', label: 'Militares', icon: <Users size={18} /> },
   { id: 'indisponibilidade', label: 'Indisponibilidade', icon: <CalendarX size={18} /> },
   { id: 'datas-especiais', label: 'Datas Especiais', icon: <Star size={18} /> },

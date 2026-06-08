@@ -158,12 +158,12 @@ td{border:1px solid #000;vertical-align:middle;padding:2px 4px}
 tr td{height:17px;font-size:8.5pt}
 .dn{width:4%;text-align:center;font-weight:bold}
 .da{width:5%;text-align:center}
-.nm{width:24%;font-weight:500}
+.nm{width:24%;font-weight:normal}
 
-/* Fim de semana */
-.weekend .dn,.weekend .da,.weekend .nm{color:#cc0000;font-weight:bold}
+/* Fim de semana - apenas dia e nome coloridos, nro da linha mantém cor padrão */
+.weekend .da,.weekend .nm{color:#cc0000;font-weight:bold}
 /* Sexta */
-.friday .dn,.friday .da,.friday .nm{background-color:#ffffc0;font-weight:bold}
+.friday .da,.friday .nm{background-color:#ffffc0;font-weight:bold}
 
 /* Seção direita */
 .ri-header{font-weight:bold;font-size:8pt;padding-left:6px}
