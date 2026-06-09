@@ -132,8 +132,8 @@ export default function Quadrinhos({ soldados, escalas }: QuadrinhosProps) {
       </div>
 
       {/* Legend */}
-      <div className="card mb-4" style={{ padding: '0.6rem 1rem' }}>
-        <div style={{ display: 'flex', gap: '1.25rem', flexWrap: 'wrap', alignItems: 'center', fontSize: '0.78rem' }}>
+      <div className="card mb-4" style={{ padding: '0.6rem 1rem', overflowX: 'auto' }}>
+        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'nowrap', alignItems: 'center', fontSize: '0.78rem', whiteSpace: 'nowrap' }}>
           {[
             { color: COLORS.past.bg,   label: 'Realizado' },
             { color: COLORS.today.bg,  label: 'Hoje' },
