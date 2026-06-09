@@ -31,8 +31,10 @@ export default function Sidebar({ currentTela, onNavigate }: SidebarProps) {
       <div className="sidebar-brand">
         <img src={logoUrl} alt="Logo DTCEA-SM" className="sidebar-brand-logo" />
         <div className="sidebar-brand-text">
-          <div className="sidebar-brand-title">DTCEA-SM</div>
-          <div className="sidebar-brand-subtitle">Escala de Serviço</div>
+          <div className="sidebar-brand-title">
+            Escala de <span style={{ color: 'var(--accent)', fontWeight: 700 }}>Serviço</span>
+          </div>
+          <div className="sidebar-brand-subtitle">DTCEA-SM · FAB</div>
         </div>
       </div>
 
