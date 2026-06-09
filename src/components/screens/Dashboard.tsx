@@ -40,22 +40,30 @@ export default function Dashboard({ data, onNavigate }: DashboardProps) {
 
       <div className="dashboard-stats">
         <div className="stat-card" onClick={() => onNavigate('soldados')} style={{ cursor: 'pointer' }}>
-          <div className="stat-icon"><Users size={22} /></div>
+          <div className="stat-icon-wrap" style={{ background: 'rgba(59,130,246,0.15)', color: '#3b82f6' }}>
+            <div className="stat-icon"><Users size={22} /></div>
+          </div>
           <div className="stat-value">{data.soldados.filter(s => s.ativo).length}</div>
           <div className="stat-label">Militares</div>
         </div>
         <div className="stat-card" onClick={() => onNavigate('historico')} style={{ cursor: 'pointer' }}>
-          <div className="stat-icon"><Archive size={22} /></div>
+          <div className="stat-icon-wrap" style={{ background: 'rgba(34,197,94,0.15)', color: '#22c55e' }}>
+            <div className="stat-icon"><Archive size={22} /></div>
+          </div>
           <div className="stat-value">{data.escalas.length}</div>
           <div className="stat-label">Escalas Salvas</div>
         </div>
         <div className="stat-card" onClick={() => onNavigate('indisponibilidade')} style={{ cursor: 'pointer' }}>
-          <div className="stat-icon"><CalendarX size={22} /></div>
+          <div className="stat-icon-wrap" style={{ background: 'rgba(239,68,68,0.15)', color: '#ef4444' }}>
+            <div className="stat-icon"><CalendarX size={22} /></div>
+          </div>
           <div className="stat-value">{activeIndisp.length}</div>
           <div className="stat-label">Indisponíveis Hoje</div>
         </div>
         <div className="stat-card" onClick={() => onNavigate('datas-especiais')} style={{ cursor: 'pointer' }}>
-          <div className="stat-icon"><Star size={22} /></div>
+          <div className="stat-icon-wrap" style={{ background: 'rgba(168,85,247,0.15)', color: '#a855f7' }}>
+            <div className="stat-icon"><Star size={22} /></div>
+          </div>
           <div className="stat-value">{data.datasEspeciais.length}</div>
           <div className="stat-label">Datas Especiais</div>
         </div>

@@ -216,7 +216,7 @@ body {
 }
 
 .sidebar-nav-item:hover {
-  background-color: var(--bg-elevated);
+  background-color: rgba(59, 130, 246, 0.08);
   color: var(--text-primary);
 }
 
@@ -224,6 +224,7 @@ body {
   background-color: rgba(59, 130, 246, 0.15);
   color: var(--accent);
   border-left-color: var(--accent);
+  font-weight: 600;
 }
 
 .sidebar-footer {
@@ -472,6 +473,7 @@ tbody tr:hover {
   background-color: var(--bg-surface);
   border: 1px solid var(--border-light);
   border-radius: 10px;
+  border-top: 3px solid var(--accent);
   width: 100%;
   max-width: 480px;
   max-height: 90vh;
@@ -743,12 +745,18 @@ tr.row-friday td {
 .escala-list-item {
   background-color: var(--bg-surface);
   border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
   border-radius: 8px;
   padding: 1rem 1.25rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
+  transition: border-color 0.15s, background-color 0.15s;
+}
+
+.escala-list-item:hover {
+  background-color: var(--bg-elevated);
 }
 
 .escala-list-item-info {
@@ -1010,18 +1018,28 @@ tr.row-friday td {
   border-radius: 8px;
   padding: 1.25rem 1rem;
   text-align: center;
-  transition: border-color 0.15s, background-color 0.15s;
+  transition: border-color 0.15s, background-color 0.15s, transform 0.15s;
 }
 
 .stat-card:hover {
   border-color: var(--accent);
   background-color: var(--bg-elevated);
+  transform: translateY(-2px);
+}
+
+.stat-icon-wrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 0.75rem;
 }
 
 .stat-icon {
-  color: var(--accent);
-  margin-bottom: 0.5rem;
   display: flex;
+  align-items: center;
   justify-content: center;
 }
 
@@ -1040,4 +1058,150 @@ tr.row-friday td {
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+/* ===== Mobile / Responsive ===== */
+
+/* Sidebar wrapper — desktop: static, mobile: fixed overlay */
+.sidebar-wrapper {
+  flex-shrink: 0;
+}
+
+.sidebar-overlay {
+  display: none;
+}
+
+/* Hamburger hidden on desktop */
+.topbar-hamburger {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  /* Sidebar becomes fixed drawer */
+  .sidebar-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    z-index: 500;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+  }
+
+  .sidebar-wrapper.sidebar-open {
+    transform: translateX(0);
+  }
+
+  /* Dark overlay behind sidebar */
+  .sidebar-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    z-index: 499;
+  }
+
+  /* Hamburger visible */
+  .topbar-hamburger {
+    display: inline-flex;
+    flex-shrink: 0;
+  }
+
+  /* Content area takes full width */
+  .main-content {
+    width: 100%;
+  }
+
+  /* Stack page headers vertically */
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .page-header > div:last-child,
+  .page-header > a:last-child,
+  .page-header > button:last-child {
+    align-self: stretch;
+  }
+
+  /* Full-width buttons in page header on mobile */
+  .page-header .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .page-header > div[style*="flex"] {
+    width: 100%;
+  }
+
+  .page-header > div[style*="flex"] .btn {
+    flex: 1;
+    justify-content: center;
+  }
+
+  /* Dashboard stats — 2 columns on mobile */
+  .dashboard-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Stat card smaller */
+  .stat-card {
+    padding: 1rem 0.75rem;
+  }
+
+  .stat-value {
+    font-size: 1.625rem;
+  }
+
+  /* Content padding reduced */
+  .content-area {
+    padding: 1rem;
+  }
+
+  /* Topbar */
+  .topbar {
+    padding: 0 1rem;
+    gap: 0.5rem;
+  }
+
+  /* Modals full-width on small screens */
+  .modal {
+    max-width: 100%;
+    margin: 0;
+    border-radius: 10px 10px 0 0;
+    max-height: 95vh;
+  }
+
+  .modal-overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  /* Form rows stack */
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  /* Escala list actions wrap */
+  .escala-list-item {
+    flex-wrap: wrap;
+  }
+
+  .escala-list-item-actions {
+    width: 100%;
+    justify-content: flex-end;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--border);
+  }
+
+  /* Table wrapper — ensure scroll */
+  .table-wrapper {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Summary grid — single column */
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
 }

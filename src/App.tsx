@@ -33,6 +33,7 @@ export default function App() {
   const [currentTela, setCurrentTela] = useState<Tela>('dashboard');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [authLoading, setAuthLoading] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const appData = useAppData();
   const settings = useSettings();
 
@@ -173,12 +174,19 @@ export default function App() {
     }
   }
 
+  function handleNavigate(tela: Tela) {
+    setCurrentTela(tela);
+    setSidebarOpen(false);
+  }
+
   return (
     <Layout
+      sidebarOpen={sidebarOpen}
+      onCloseSidebar={() => setSidebarOpen(false)}
       sidebar={
         <Sidebar
           currentTela={currentTela}
-          onNavigate={setCurrentTela}
+          onNavigate={handleNavigate}
         />
       }
       topbar={
@@ -186,6 +194,7 @@ export default function App() {
           title={telaLabels[currentTela]}
           theme={settings.theme}
           onToggleTheme={settings.toggleTheme}
+          onToggleSidebar={() => setSidebarOpen(o => !o)}
         />
       }
     >
