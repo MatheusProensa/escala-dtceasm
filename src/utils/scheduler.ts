@@ -172,11 +172,11 @@ export function gerarEscala(
   const assignments = new Map<string, string | null>();
   const excMap = new Map<string, boolean>();
 
-  // Intervalo mínimo entre dois serviços do mesmo militar (|diff| >= 2)
-  // A checagem é BIDIRECIONAL: ao atribuir uma data, verificamos TODOS os dias já
-  // atribuídos (passados E futuros na escala) para garantir que não há serviços
-  // adjacentes. Isso evita o padrão Qua→Sex→Sáb causado pelo processamento
-  // cronológico (onde Sáb era atribuído sem saber que Ennes já pegaria Sex depois).
+  // Intervalo mínimo entre dois serviços do mesmo militar (|diff| >= 2).
+  // A checagem é bidirecional: ao atribuir uma data, verifica todos os dias já
+  // atribuídos (passados e futuros na escala), pois os dias são processados por
+  // prioridade de tipo — não em ordem cronológica — e um serviço futuro pode já
+  // estar atribuído.
   function minGapForSoldier(soldadoId: string, dateStr: string): number {
     let min = Infinity;
     // Histórico pré-período (apenas backward)
