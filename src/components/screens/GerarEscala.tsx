@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Zap, Save, AlertTriangle, CheckCircle } from 'lucide-react';
-import type { Soldado, Indisponibilidade, DataEspecial, Escala, EscalaDia } from '../../types';
+import type { Soldado, Indisponibilidade, DataEspecial, Escala, EscalaDia, TrocaServico } from '../../types';
 import { gerarEscala, getNextMonthStart, getNextMonthEnd, computeQuadrinhosFromDias } from '../../utils/scheduler';
 import { formatDateBR, getDayName } from '../../utils/dateUtils';
 
@@ -9,6 +9,7 @@ interface GerarEscalaProps {
   indisponibilidades: Indisponibilidade[];
   datasEspeciais: DataEspecial[];
   escalas: Escala[];
+  trocas: TrocaServico[];
   onSave: (escala: Omit<Escala, 'id' | 'geradaEm'>) => Escala;
   onGoToHistorico: () => void;
 }
@@ -36,6 +37,7 @@ export default function GerarEscala({
   indisponibilidades,
   datasEspeciais,
   escalas,
+  trocas,
   onSave,
   onGoToHistorico,
 }: GerarEscalaProps) {
@@ -340,7 +342,12 @@ export default function GerarEscala({
                       </td>
                       <td>
                         {dia.soldadoId ? (
-                          <span style={{ fontWeight: 500 }}>{getSoldadoLabel(soldados, dia.soldadoId)}</span>
+                          <span style={{ fontWeight: 500 }}>
+                            {getSoldadoLabel(soldados, dia.soldadoId)}
+                            {trocas.some(t => t.data === dia.data) && (
+                              <span title="Troca de serviço registrada" style={{ marginLeft: '0.35rem', fontSize: '0.7rem', background: 'var(--accent)', color: '#fff', borderRadius: 4, padding: '1px 5px', fontWeight: 600, verticalAlign: 'middle' }}>T</span>
+                            )}
+                          </span>
                         ) : (
                           <span className="text-danger" style={{ fontWeight: 500 }}>SEM SOLDADO</span>
                         )}

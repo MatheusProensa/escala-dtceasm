@@ -1,4 +1,4 @@
-import type { Escala, Soldado, Indisponibilidade, DataEspecial } from '../types';
+import type { Escala, Soldado, Indisponibilidade, DataEspecial, TrocaServico } from '../types';
 import { getDayOfWeek, getMonthName } from './dateUtils';
 import { computeQuadrinhos } from './scheduler';
 
@@ -32,6 +32,7 @@ export function generatePrintHtml(
   todasEscalas: Escala[],
   escalante: string,
   comandante: string,
+  trocas: TrocaServico[] = [],
 ): string {
   const { dias, periodo } = escala;
   const D = dias.length;
@@ -66,6 +67,10 @@ export function generatePrintHtml(
   const rVermelha = getRanking('vermelha');
   const reservaRows = Math.max(rPreta.length, rAmarela.length, rVermelha.length, 1);
 
+  // Trocas que caem dentro do período da escala
+  const trocasDoPeriodo = trocas.filter(t => t.data >= periodo.inicio && t.data <= periodo.fim);
+  const hasTrocasNoPeriodo = trocasDoPeriodo.length > 0;
+
   // Feriados que caem dentro do período da escala
   const feriadosDoPeriodo = datasEspeciais
     .filter(d => d.data >= periodo.inicio && d.data <= periodo.fim)
@@ -90,7 +95,8 @@ export function generatePrintHtml(
     const dayNum = i + 1;
     const dow = getDayOfWeek(dia.data);
     const dayAbbrev = DAY_ABBREV[dow] ?? '';
-    const nomeMilitar = esc(militarLabel(soldados, dia.soldadoId));
+    const hasTroca = trocas.some(t => t.data === dia.data);
+    const nomeMilitar = esc(militarLabel(soldados, dia.soldadoId)) + (hasTroca ? ' *' : '');
 
     const isFriday = dow === 5;
     let rowClass = '';
@@ -254,6 +260,7 @@ tr td{height:17px;font-size:8.5pt}
   ${rowsHtml}
 </table>
 
+${hasTrocasNoPeriodo ? `<p style="font-size:7pt;margin-top:4px;color:#333">* Troca de Serviço</p>` : ''}
 </body>
 </html>`;
 }

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Archive, Eye, Trash2, ArrowLeft, FileDown, AlertTriangle } from 'lucide-react';
-import type { Soldado, Escala, Indisponibilidade, DataEspecial } from '../../types';
+import type { Soldado, Escala, Indisponibilidade, DataEspecial, TrocaServico } from '../../types';
 import { formatDateBR, getDayName } from '../../utils/dateUtils';
 import { computeQuadrinhosFromDias } from '../../utils/scheduler';
 import { generatePrintHtml } from '../../utils/printHtml';
@@ -10,6 +10,7 @@ interface HistoricoProps {
   escalas: Escala[];
   indisponibilidades: Indisponibilidade[];
   datasEspeciais: DataEspecial[];
+  trocas: TrocaServico[];
   onDelete: (id: string) => void;
   escalante: string;
   comandante: string;
@@ -48,7 +49,7 @@ function formatDateTime(isoStr: string): string {
   }
 }
 
-export default function Historico({ soldados, escalas, indisponibilidades, datasEspeciais, onDelete, escalante, comandante }: HistoricoProps) {
+export default function Historico({ soldados, escalas, indisponibilidades, datasEspeciais, trocas, onDelete, escalante, comandante }: HistoricoProps) {
   const [viewingId, setViewingId] = useState<string | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
@@ -72,6 +73,7 @@ export default function Historico({ soldados, escalas, indisponibilidades, datas
       escalas,
       escalante,
       comandante,
+      trocas,
     );
 
     const w = window.open('', '_blank');
@@ -179,7 +181,12 @@ export default function Historico({ soldados, escalas, indisponibilidades, datas
                   </td>
                   <td>
                     {dia.soldadoId ? (
-                      <span style={{ fontWeight: 500 }}>{getSoldadoLabel(soldados, dia.soldadoId)}</span>
+                      <span style={{ fontWeight: 500 }}>
+                        {getSoldadoLabel(soldados, dia.soldadoId)}
+                        {trocas.some(t => t.data === dia.data) && (
+                          <span title="Troca de serviço registrada" style={{ marginLeft: '0.35rem', fontSize: '0.7rem', background: 'var(--accent)', color: '#fff', borderRadius: 4, padding: '1px 5px', fontWeight: 600, verticalAlign: 'middle' }}>T</span>
+                        )}
+                      </span>
                     ) : (
                       <span className="text-danger" style={{ fontWeight: 500 }}>SEM MILITAR</span>
                     )}

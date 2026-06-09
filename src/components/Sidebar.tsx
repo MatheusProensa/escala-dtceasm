@@ -1,4 +1,4 @@
-import { Home, Users, Star, Zap, Archive, CalendarX, Settings, BarChart2, BookOpen } from 'lucide-react';
+import { Home, Users, Star, Zap, Archive, CalendarX, Settings, BarChart2, BookOpen, ArrowLeftRight } from 'lucide-react';
 import type { Tela } from '../types';
 import logoUrl from '../assets/logo-dtceasm.png';
 
@@ -28,6 +28,7 @@ const navGroups: { label: string; items: NavItem[] }[] = [
       { id: 'datas-especiais', label: 'Escala Roxa', icon: <Star size={17} /> },
       { id: 'gerar', label: 'Gerar Escala', icon: <Zap size={17} /> },
       { id: 'historico', label: 'Histórico', icon: <Archive size={17} /> },
+      { id: 'troca-servico', label: 'Troca de Serviço', icon: <ArrowLeftRight size={17} /> },
       { id: 'quadrinhos', label: 'Quadrinhos', icon: <BarChart2 size={17} /> },
     ],
   },

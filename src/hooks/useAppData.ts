@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import type { AppData, Soldado, Indisponibilidade, DataEspecial, Escala } from '../types';
+import type { AppData, Soldado, Indisponibilidade, DataEspecial, Escala, TrocaServico } from '../types';
 import { supabase } from '../lib/supabase';
 
 const defaultData: AppData = {
@@ -7,6 +7,7 @@ const defaultData: AppData = {
   indisponibilidades: [],
   datasEspeciais: [],
   escalas: [],
+  trocas: [],
 };
 
 function generateId(): string {
@@ -44,17 +45,19 @@ export function useAppData() {
     setLoading(true);
     setError(null);
     try {
-      const [soldadosRes, indispRes, datasRes, escalasRes] = await Promise.all([
+      const [soldadosRes, indispRes, datasRes, escalasRes, trocasRes] = await Promise.all([
         supabase.from('soldados').select('*').order('ordem_antiguidade'),
         supabase.from('indisponibilidades').select('*'),
         supabase.from('datas_especiais').select('*'),
         supabase.from('escalas').select('*').order('gerada_em', { ascending: false }),
+        supabase.from('trocas_servico').select('*').order('data', { ascending: false }),
       ]);
 
       if (soldadosRes.error) throw soldadosRes.error;
       if (indispRes.error) throw indispRes.error;
       if (datasRes.error) throw datasRes.error;
       if (escalasRes.error) throw escalasRes.error;
+      if (trocasRes.error) throw trocasRes.error;
 
       setData({
         soldados: (soldadosRes.data ?? []).map(s => ({
@@ -83,6 +86,14 @@ export function useAppData() {
           periodo: { inicio: e.periodo_inicio as string, fim: e.periodo_fim as string },
           dias: e.dias as Escala['dias'],
           geradaEm: e.gerada_em as string,
+        })),
+        trocas: (trocasRes.data ?? []).map(t => ({
+          id: t.id as string,
+          data: t.data as string,
+          soldadoSubstituidoId: t.soldado_substituido_id as string,
+          soldadoSubstitutoId: t.soldado_substituto_id as string,
+          observacao: (t.observacao as string) ?? '',
+          criadaEm: t.criada_em as string,
         })),
       });
     } catch (err) {
@@ -227,6 +238,27 @@ export function useAppData() {
       .then(({ error }) => { if (error) console.error('deleteEscala:', error); });
   }
 
+  // ---- Trocas de Serviço ----
+
+  function addTroca(troca: Omit<TrocaServico, 'id' | 'criadaEm'>): void {
+    const newTroca: TrocaServico = { ...troca, id: generateId(), criadaEm: new Date().toISOString() };
+    setData(prev => ({ ...prev, trocas: [newTroca, ...prev.trocas] }));
+    supabase.from('trocas_servico').insert({
+      id: newTroca.id,
+      data: newTroca.data,
+      soldado_substituido_id: newTroca.soldadoSubstituidoId,
+      soldado_substituto_id: newTroca.soldadoSubstitutoId,
+      observacao: newTroca.observacao,
+      criada_em: newTroca.criadaEm,
+    }).then(({ error }) => { if (error) console.error('addTroca:', error); });
+  }
+
+  function deleteTroca(id: string): void {
+    setData(prev => ({ ...prev, trocas: prev.trocas.filter(t => t.id !== id) }));
+    supabase.from('trocas_servico').delete().eq('id', id)
+      .then(({ error }) => { if (error) console.error('deleteTroca:', error); });
+  }
+
   return {
     data,
     loading,
@@ -241,5 +273,7 @@ export function useAppData() {
     deleteDataEspecial,
     saveEscala,
     deleteEscala,
+    addTroca,
+    deleteTroca,
   };
 }

@@ -38,11 +38,21 @@ export interface Escala {
   geradaEm: string;
 }
 
-export type Tela = 'dashboard' | 'soldados' | 'indisponibilidade' | 'datas-especiais' | 'gerar' | 'historico' | 'quadrinhos' | 'regulamento' | 'configuracoes';
+export interface TrocaServico {
+  id: string;
+  data: string; // YYYY-MM-DD
+  soldadoSubstituidoId: string;
+  soldadoSubstitutoId: string;
+  observacao: string;
+  criadaEm: string;
+}
+
+export type Tela = 'dashboard' | 'soldados' | 'indisponibilidade' | 'datas-especiais' | 'gerar' | 'historico' | 'quadrinhos' | 'regulamento' | 'configuracoes' | 'troca-servico';
 
 export interface AppData {
   soldados: Soldado[];
   indisponibilidades: Indisponibilidade[];
   datasEspeciais: DataEspecial[];
   escalas: Escala[];
+  trocas: TrocaServico[];
 }

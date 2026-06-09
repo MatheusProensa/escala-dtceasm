@@ -16,6 +16,7 @@ import Historico from './components/screens/Historico';
 import Configuracoes from './components/screens/Configuracoes';
 import Quadrinhos from './components/screens/Quadrinhos';
 import Regulamento from './components/screens/Regulamento';
+import TrocaServico from './components/screens/TrocaServico';
 
 const telaLabels: Record<Tela, string> = {
   dashboard: 'Início',
@@ -27,6 +28,7 @@ const telaLabels: Record<Tela, string> = {
   quadrinhos: 'Quadrinhos',
   regulamento: 'Regulamento',
   configuracoes: 'Configurações',
+  'troca-servico': 'Troca de Serviço',
 };
 
 export default function App() {
@@ -136,6 +138,7 @@ export default function App() {
             indisponibilidades={appData.data.indisponibilidades}
             datasEspeciais={appData.data.datasEspeciais}
             escalas={appData.data.escalas}
+            trocas={appData.data.trocas}
             onSave={appData.saveEscala}
             onGoToHistorico={() => setCurrentTela('historico')}
           />
@@ -147,6 +150,7 @@ export default function App() {
             escalas={appData.data.escalas}
             indisponibilidades={appData.data.indisponibilidades}
             datasEspeciais={appData.data.datasEspeciais}
+            trocas={appData.data.trocas}
             onDelete={appData.deleteEscala}
             escalante={settings.escalante}
             comandante={settings.comandante}
@@ -157,6 +161,15 @@ export default function App() {
           <Quadrinhos
             soldados={appData.data.soldados}
             escalas={appData.data.escalas}
+          />
+        );
+      case 'troca-servico':
+        return (
+          <TrocaServico
+            soldados={appData.data.soldados}
+            trocas={appData.data.trocas}
+            onAdd={appData.addTroca}
+            onDelete={appData.deleteTroca}
           />
         );
       case 'regulamento':
