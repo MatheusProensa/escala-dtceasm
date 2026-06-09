@@ -251,8 +251,22 @@ body {
 
 .sidebar-nav {
   flex: 1;
-  padding: 0.75rem 0;
+  padding: 0.5rem 0;
   overflow-y: auto;
+}
+
+.sidebar-nav-group {
+  margin-bottom: 0.25rem;
+}
+
+.sidebar-nav-group-label {
+  padding: 0.625rem 1rem 0.25rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  opacity: 0.7;
 }
 
 .sidebar-nav-item {
@@ -702,9 +716,10 @@ textarea {
 }
 
 .page-title {
-  font-size: 1.125rem;
-  font-weight: 600;
+  font-size: 1.5rem;
+  font-weight: 700;
   color: var(--text-primary);
+  letter-spacing: -0.01em;
 }
 
 .page-subtitle {
@@ -1093,52 +1108,23 @@ tr.row-friday td {
 /* ===== Dashboard Stats ===== */
 .dashboard-stats {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 1rem;
 }
 
 .stat-card {
   background-color: var(--bg-surface);
   border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 1.25rem 1rem;
-  text-align: center;
-  transition: border-color var(--dur-fast), background-color var(--dur-fast), transform var(--dur-base) var(--ease-out);
+  border-radius: 10px;
+  padding: 1.375rem 1.25rem;
+  transition: border-color var(--dur-fast), background-color var(--dur-fast), transform var(--dur-base) var(--ease-out), box-shadow var(--dur-base) var(--ease-out);
 }
 
 .stat-card:hover {
   border-color: var(--accent);
   background-color: var(--bg-elevated);
   transform: translateY(-2px);
-}
-
-.stat-icon-wrap {
-  width: 44px;
-  height: 44px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 0.75rem;
-}
-
-.stat-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.stat-value {
-  font-size: 2rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  line-height: 1;
-}
-
-.stat-label {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  margin-top: 0.375rem;
+  box-shadow: 0 8px 24px -10px rgba(0,0,0,0.25);
 }
 
 @keyframes spin {

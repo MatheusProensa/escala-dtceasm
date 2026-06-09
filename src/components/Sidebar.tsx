@@ -13,16 +13,31 @@ interface NavItem {
   icon: React.ReactNode;
 }
 
-const navItems: NavItem[] = [
-  { id: 'dashboard', label: 'Início', icon: <Home size={18} /> },
-  { id: 'soldados', label: 'Militares', icon: <Users size={18} /> },
-  { id: 'indisponibilidade', label: 'Indisponibilidade', icon: <CalendarX size={18} /> },
-  { id: 'datas-especiais', label: 'Escala Roxa', icon: <Star size={18} /> },
-  { id: 'gerar', label: 'Gerar Escala', icon: <Zap size={18} /> },
-  { id: 'historico', label: 'Histórico', icon: <Archive size={18} /> },
-  { id: 'quadrinhos', label: 'Quadrinhos', icon: <BarChart2 size={18} /> },
-  { id: 'regulamento', label: 'Regulamento', icon: <BookOpen size={18} /> },
-  { id: 'configuracoes', label: 'Configurações', icon: <Settings size={18} /> },
+const navGroups: { label: string; items: NavItem[] }[] = [
+  {
+    label: 'Principal',
+    items: [
+      { id: 'dashboard', label: 'Início', icon: <Home size={17} /> },
+      { id: 'soldados', label: 'Militares', icon: <Users size={17} /> },
+    ],
+  },
+  {
+    label: 'Escala',
+    items: [
+      { id: 'indisponibilidade', label: 'Indisponibilidade', icon: <CalendarX size={17} /> },
+      { id: 'datas-especiais', label: 'Escala Roxa', icon: <Star size={17} /> },
+      { id: 'gerar', label: 'Gerar Escala', icon: <Zap size={17} /> },
+      { id: 'historico', label: 'Histórico', icon: <Archive size={17} /> },
+      { id: 'quadrinhos', label: 'Quadrinhos', icon: <BarChart2 size={17} /> },
+    ],
+  },
+  {
+    label: 'Gestão',
+    items: [
+      { id: 'regulamento', label: 'Regulamento', icon: <BookOpen size={17} /> },
+      { id: 'configuracoes', label: 'Configurações', icon: <Settings size={17} /> },
+    ],
+  },
 ];
 
 export default function Sidebar({ currentTela, onNavigate }: SidebarProps) {
@@ -39,16 +54,21 @@ export default function Sidebar({ currentTela, onNavigate }: SidebarProps) {
       </div>
 
       <nav className="sidebar-nav">
-        {navItems.map(item => (
-          <button
-            key={item.id}
-            className={`sidebar-nav-item${currentTela === item.id ? ' active' : ''}`}
-            onClick={() => onNavigate(item.id)}
-            type="button"
-          >
-            {item.icon}
-            {item.label}
-          </button>
+        {navGroups.map(group => (
+          <div key={group.label} className="sidebar-nav-group">
+            <div className="sidebar-nav-group-label">{group.label}</div>
+            {group.items.map(item => (
+              <button
+                key={item.id}
+                className={`sidebar-nav-item${currentTela === item.id ? ' active' : ''}`}
+                onClick={() => onNavigate(item.id)}
+                type="button"
+              >
+                {item.icon}
+                {item.label}
+              </button>
+            ))}
+          </div>
         ))}
       </nav>
 

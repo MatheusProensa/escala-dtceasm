@@ -7,6 +7,37 @@ interface DashboardProps {
   onNavigate: (tela: Tela) => void;
 }
 
+interface StatCardProps {
+  icon: React.ReactNode;
+  iconBg: string;
+  iconColor: string;
+  value: number;
+  label: string;
+  sub: string;
+  onClick: () => void;
+}
+
+function StatCard({ icon, iconBg, iconColor, value, label, sub, onClick }: StatCardProps) {
+  return (
+    <div className="stat-card" onClick={onClick} style={{ cursor: 'pointer' }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem' }}>
+        <div style={{
+          width: 52, height: 52, borderRadius: 12, flexShrink: 0,
+          background: iconBg, color: iconColor,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
+          {icon}
+        </div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>{label}</div>
+          <div style={{ fontSize: '2rem', fontWeight: 700, lineHeight: 1, color: 'var(--text-primary)' }}>{value}</div>
+          <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '0.375rem' }}>{sub}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Dashboard({ data, onNavigate }: DashboardProps) {
   const today = new Date().toISOString().slice(0, 10);
 
@@ -19,17 +50,14 @@ export default function Dashboard({ data, onNavigate }: DashboardProps) {
     : null;
 
   const todayFormatted = new Date().toLocaleDateString('pt-BR', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
+    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
   });
 
   return (
     <div>
       <div className="page-header">
         <div>
-          <div className="page-title">Início</div>
+          <div className="page-title">Dashboard</div>
           <div className="page-subtitle" style={{ textTransform: 'capitalize' }}>{todayFormatted}</div>
         </div>
         <button className="btn btn-primary" onClick={() => onNavigate('gerar')} type="button">
@@ -39,34 +67,34 @@ export default function Dashboard({ data, onNavigate }: DashboardProps) {
       </div>
 
       <div className="dashboard-stats">
-        <div className="stat-card" onClick={() => onNavigate('soldados')} style={{ cursor: 'pointer' }}>
-          <div className="stat-icon-wrap" style={{ background: 'rgba(59,130,246,0.15)', color: '#3b82f6' }}>
-            <div className="stat-icon"><Users size={22} /></div>
-          </div>
-          <div className="stat-value">{data.soldados.filter(s => s.ativo).length}</div>
-          <div className="stat-label">Militares</div>
-        </div>
-        <div className="stat-card" onClick={() => onNavigate('historico')} style={{ cursor: 'pointer' }}>
-          <div className="stat-icon-wrap" style={{ background: 'rgba(34,197,94,0.15)', color: '#22c55e' }}>
-            <div className="stat-icon"><Archive size={22} /></div>
-          </div>
-          <div className="stat-value">{data.escalas.length}</div>
-          <div className="stat-label">Escalas Salvas</div>
-        </div>
-        <div className="stat-card" onClick={() => onNavigate('indisponibilidade')} style={{ cursor: 'pointer' }}>
-          <div className="stat-icon-wrap" style={{ background: 'rgba(239,68,68,0.15)', color: '#ef4444' }}>
-            <div className="stat-icon"><CalendarX size={22} /></div>
-          </div>
-          <div className="stat-value">{activeIndisp.length}</div>
-          <div className="stat-label">Indisponíveis Hoje</div>
-        </div>
-        <div className="stat-card" onClick={() => onNavigate('datas-especiais')} style={{ cursor: 'pointer' }}>
-          <div className="stat-icon-wrap" style={{ background: 'rgba(168,85,247,0.15)', color: '#a855f7' }}>
-            <div className="stat-icon"><Star size={22} /></div>
-          </div>
-          <div className="stat-value">{data.datasEspeciais.length}</div>
-          <div className="stat-label">Escala Roxa</div>
-        </div>
+        <StatCard
+          icon={<Users size={24} />}
+          iconBg="rgba(59,130,246,0.15)" iconColor="#3b82f6"
+          value={data.soldados.filter(s => s.ativo).length}
+          label="Militares" sub="Ativos no sistema"
+          onClick={() => onNavigate('soldados')}
+        />
+        <StatCard
+          icon={<Archive size={24} />}
+          iconBg="rgba(34,197,94,0.15)" iconColor="#22c55e"
+          value={data.escalas.length}
+          label="Escalas Salvas" sub="No histórico"
+          onClick={() => onNavigate('historico')}
+        />
+        <StatCard
+          icon={<CalendarX size={24} />}
+          iconBg="rgba(239,68,68,0.15)" iconColor="#ef4444"
+          value={activeIndisp.length}
+          label="Indisponíveis Hoje" sub="Militares afastados"
+          onClick={() => onNavigate('indisponibilidade')}
+        />
+        <StatCard
+          icon={<Star size={24} />}
+          iconBg="rgba(168,85,247,0.15)" iconColor="#a855f7"
+          value={data.datasEspeciais.length}
+          label="Escala Roxa" sub="Datas registradas"
+          onClick={() => onNavigate('datas-especiais')}
+        />
       </div>
 
       {lastEscala && (
