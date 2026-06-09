@@ -146,6 +146,7 @@ export default function App() {
             soldados={appData.data.soldados}
             escalas={appData.data.escalas}
             indisponibilidades={appData.data.indisponibilidades}
+            datasEspeciais={appData.data.datasEspeciais}
             onDelete={appData.deleteEscala}
             escalante={settings.escalante}
             comandante={settings.comandante}

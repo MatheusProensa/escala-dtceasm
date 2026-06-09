@@ -1,4 +1,4 @@
-import type { Escala, Soldado, Indisponibilidade } from '../types';
+import type { Escala, Soldado, Indisponibilidade, DataEspecial } from '../types';
 import { getDayOfWeek, getMonthName } from './dateUtils';
 import { computeQuadrinhos } from './scheduler';
 
@@ -28,6 +28,7 @@ export function generatePrintHtml(
   escala: Escala,
   soldados: Soldado[],
   indisponibilidades: Indisponibilidade[],
+  datasEspeciais: DataEspecial[],
   todasEscalas: Escala[],
   escalante: string,
   comandante: string,
@@ -66,15 +67,22 @@ export function generatePrintHtml(
   const rRoxa = getRanking('roxa');
   const reservaRows = Math.max(rPreta.length, rAmarela.length, rVermelha.length, rRoxa.length, 1);
 
+  // Feriados que caem dentro do período da escala
+  const feriadosDoPeriodo = datasEspeciais
+    .filter(d => d.data >= periodo.inicio && d.data <= periodo.fim)
+    .sort((a, b) => a.data.localeCompare(b.data));
+
   // Posições fixas na coluna direita (índice 1-based)
   const POS_INDISP_HEADER = 1;
   const POS_INDISP_START = 2;
-  const POS_RESERVA_BLOCK = 14;  // rowspan=2 covering lines 14 and 15
-  const POS_RESERVA_SKIP = 15;   // covered by rowspan — no td on right side
+  const POS_RESERVA_BLOCK = 14;
+  const POS_RESERVA_SKIP = 15;
   const POS_RESERVA_EMPTY = 16;
   const POS_TIPO_HEADER = 17;
   const POS_DATA_START = 18;
   const POS_DATA_END = 17 + reservaRows;
+  const POS_FERIADOS_HEADER = POS_DATA_END + 2;
+  const POS_FERIADOS_END = POS_FERIADOS_HEADER + Math.max(feriadosDoPeriodo.length - 1, 0);
 
   let rowsHtml = '';
 
@@ -108,7 +116,7 @@ export function generatePrintHtml(
     } else if (D >= POS_TIPO_HEADER && dayNum === POS_TIPO_HEADER) {
       rightHtml = `
         <td class="tipo-h">PRETA</td>
-        <td class="tipo-h amarela-bg">AMARELA</td>
+        <td class="tipo-h"><span class="amarela-hl">AMARELA</span></td>
         <td class="tipo-h vermelha-c">VERMELHA</td>
         <td class="tipo-h">ROXA</td>`;
     } else if (D >= POS_DATA_START && dayNum >= POS_DATA_START && dayNum <= POS_DATA_END) {
@@ -119,9 +127,15 @@ export function generatePrintHtml(
       const r = rRoxa[idx];
       rightHtml = `
         <td class="re-cell">${p ? esc(militarLabel(soldados, p.id)) : ''}</td>
-        <td class="re-cell amarela-bg">${a ? esc(militarLabel(soldados, a.id)) : ''}</td>
+        <td class="re-cell"><span class="amarela-hl">${a ? esc(militarLabel(soldados, a.id)) : ''}</span></td>
         <td class="re-cell vermelha-c">${v ? esc(militarLabel(soldados, v.id)) : ''}</td>
         <td class="re-cell">${r ? esc(militarLabel(soldados, r.id)) : ''}</td>`;
+    } else if (feriadosDoPeriodo.length > 0 && dayNum === POS_FERIADOS_HEADER) {
+      const fd = feriadosDoPeriodo[0]!;
+      rightHtml = `<td colspan="4" class="feriados-header">Feriados: ${esc(ddmm(fd.data))}${fd.descricao ? ` - ${esc(fd.descricao)}` : ''}</td>`;
+    } else if (feriadosDoPeriodo.length > 1 && dayNum > POS_FERIADOS_HEADER && dayNum <= POS_FERIADOS_END) {
+      const fd = feriadosDoPeriodo[dayNum - POS_FERIADOS_HEADER]!;
+      rightHtml = `<td colspan="4" class="feriados-item">${esc(ddmm(fd.data))}${fd.descricao ? ` - ${esc(fd.descricao)}` : ''}</td>`;
     } else {
       rightHtml = `<td colspan="4"></td>`;
     }
@@ -163,8 +177,9 @@ tr td{height:17px;font-size:8.5pt}
 
 /* Fim de semana */
 .weekend .dn,.weekend .da,.weekend .nm{color:#cc0000;font-weight:bold}
-/* Sexta */
-.friday .dn,.friday .da,.friday .nm{background-color:#ffffc0;font-weight:bold}
+/* Sexta — fundo amarelo só no número e dia, nome sublinhado */
+.friday .dn,.friday .da{background-color:#ffffc0;font-weight:bold}
+.friday .nm{font-weight:bold;text-decoration:underline;text-decoration-color:#b8860b;text-decoration-thickness:2px}
 
 /* Seção direita */
 .ri-header{font-weight:bold;font-size:8pt;padding-left:6px}
@@ -173,9 +188,11 @@ tr td{height:17px;font-size:8.5pt}
 .re-block .re-title{font-size:9pt;font-weight:bold;display:block}
 .re-block .re-sub{font-size:8pt;font-style:italic;font-weight:normal;display:block}
 .tipo-h{font-weight:bold;text-align:center;font-size:8pt;width:16.75%}
-.amarela-bg{background-color:#ffffc0}
+.amarela-hl{text-decoration:underline;text-decoration-color:#b8860b;text-decoration-thickness:2px;font-weight:bold}
 .vermelha-c{color:#cc0000}
 .re-cell{text-align:center;font-size:8pt;width:16.75%}
+.feriados-header{background-color:#b2f5ea;font-weight:bold;font-size:8pt;padding-left:6px;color:#065f46}
+.feriados-item{font-size:8pt;padding-left:6px;background-color:#e6fffa}
 
 @media print{
   *{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important}
@@ -183,9 +200,11 @@ tr td{height:17px;font-size:8.5pt}
   body{font-size:8pt}
   tr td{height:14px}
   .weekend .dn,.weekend .da,.weekend .nm{color:#cc0000 !important;font-weight:bold !important}
-  .friday .dn,.friday .da,.friday .nm{background-color:#ffffc0 !important;font-weight:bold !important}
-  .amarela-bg{background-color:#ffffc0 !important}
+  .friday .dn,.friday .da{background-color:#ffffc0 !important;font-weight:bold !important}
+  .friday .nm{font-weight:bold !important;text-decoration:underline !important;text-decoration-color:#b8860b !important}
+  .amarela-hl{text-decoration:underline !important;text-decoration-color:#b8860b !important;font-weight:bold !important}
   .vermelha-c{color:#cc0000 !important}
+  .feriados-header{background-color:#b2f5ea !important;color:#065f46 !important}
 }
 </style>
 <script>window.onload=function(){setTimeout(function(){window.print()},400)}</script>

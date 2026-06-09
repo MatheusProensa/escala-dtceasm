@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Archive, Eye, Trash2, ArrowLeft, FileDown, AlertTriangle } from 'lucide-react';
-import type { Soldado, Escala, Indisponibilidade } from '../../types';
+import type { Soldado, Escala, Indisponibilidade, DataEspecial } from '../../types';
 import { formatDateBR, getDayName } from '../../utils/dateUtils';
 import { computeQuadrinhosFromDias } from '../../utils/scheduler';
 import { generatePrintHtml } from '../../utils/printHtml';
@@ -9,6 +9,7 @@ interface HistoricoProps {
   soldados: Soldado[];
   escalas: Escala[];
   indisponibilidades: Indisponibilidade[];
+  datasEspeciais: DataEspecial[];
   onDelete: (id: string) => void;
   escalante: string;
   comandante: string;
@@ -47,7 +48,7 @@ function formatDateTime(isoStr: string): string {
   }
 }
 
-export default function Historico({ soldados, escalas, indisponibilidades, onDelete, escalante, comandante }: HistoricoProps) {
+export default function Historico({ soldados, escalas, indisponibilidades, datasEspeciais, onDelete, escalante, comandante }: HistoricoProps) {
   const [viewingId, setViewingId] = useState<string | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
@@ -67,6 +68,7 @@ export default function Historico({ soldados, escalas, indisponibilidades, onDel
       escala,
       soldados,
       indisponibilidades,
+      datasEspeciais,
       escalas,
       escalante,
       comandante,
