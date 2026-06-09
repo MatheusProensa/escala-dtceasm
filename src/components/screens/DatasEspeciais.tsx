@@ -90,8 +90,8 @@ export default function DatasEspeciais({
     <div>
       <div className="page-header">
         <div>
-          <div className="page-title">Datas Especiais</div>
-          <div className="page-subtitle">Feriados e datas com quadrinhos especiais</div>
+          <div className="page-title">Escala Roxa</div>
+          <div className="page-subtitle">Feriados e datas com quadrinho roxa</div>
         </div>
         <button className="btn btn-primary" onClick={openAdd} type="button">
           <Plus size={16} />

@@ -65,7 +65,7 @@ export default function Dashboard({ data, onNavigate }: DashboardProps) {
             <div className="stat-icon"><Star size={22} /></div>
           </div>
           <div className="stat-value">{data.datasEspeciais.length}</div>
-          <div className="stat-label">Datas Especiais</div>
+          <div className="stat-label">Escala Roxa</div>
         </div>
       </div>
 
