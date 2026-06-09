@@ -1,6 +1,12 @@
 import type { Soldado, Indisponibilidade, DataEspecial, Escala, EscalaDia, TipoQuadrinho } from '../types';
 import { getDayOfWeek, getDaysInRange, parseDate, formatDate } from './dateUtils';
 
+function addDays(dateStr: string, n: number): string {
+  const d = parseDate(dateStr);
+  d.setDate(d.getDate() + n);
+  return formatDate(d);
+}
+
 export type QuadrinhoCount = {
   preta: number;
   amarela: number;
@@ -10,17 +16,40 @@ export type QuadrinhoCount = {
 
 /**
  * Determine the tipo of quadrinho for a given date.
- * Priority: datasEspeciais override > weekend > friday > else preta
+ *
+ * Rules:
+ * - Feriado cadastrado (Vermelha/Roxa) → usa o tipo cadastrado
+ * - Sábado/Domingo → Vermelha
+ * - Sexta → Amarela (véspera do fim de semana)
+ * - Quinta → Amarela SOMENTE se sexta for feriado (véspera sobe pra quinta)
+ * - Quarta → Amarela SOMENTE se quinta E sexta forem feriado (feriadão)
+ * - Demais → Preta
  */
 export function getTipoQuadrinho(dateStr: string, datasEspeciais: DataEspecial[]): TipoQuadrinho {
-  // Check special dates first
   const especial = datasEspeciais.find(d => d.data === dateStr);
   if (especial) return especial.tipo;
 
   const dow = getDayOfWeek(dateStr);
-  if (dow === 0 || dow === 6) return 'vermelha'; // Sunday or Saturday
-  if (dow === 5) return 'amarela'; // Friday
-  return 'preta'; // Mon-Thu
+
+  if (dow === 0 || dow === 6) return 'vermelha';
+  if (dow === 5) return 'amarela';
+
+  if (dow === 4) {
+    // Quinta → Amarela se sexta for feriado
+    const sexta = addDays(dateStr, 1);
+    if (datasEspeciais.some(d => d.data === sexta)) return 'amarela';
+  }
+
+  if (dow === 3) {
+    // Quarta → Amarela somente se quinta E sexta forem feriado
+    const quinta = addDays(dateStr, 1);
+    const sexta = addDays(dateStr, 2);
+    if (datasEspeciais.some(d => d.data === quinta) && datasEspeciais.some(d => d.data === sexta)) {
+      return 'amarela';
+    }
+  }
+
+  return 'preta';
 }
 
 /**

@@ -25,7 +25,7 @@ const navGroups: { label: string; items: NavItem[] }[] = [
     label: 'Escala',
     items: [
       { id: 'indisponibilidade', label: 'Indisponibilidade', icon: <CalendarX size={17} /> },
-      { id: 'datas-especiais', label: 'Escala Roxa', icon: <Star size={17} /> },
+      { id: 'datas-especiais', label: 'Feriados', icon: <Star size={17} /> },
       { id: 'gerar', label: 'Gerar Escala', icon: <Zap size={17} /> },
       { id: 'historico', label: 'Histórico', icon: <Archive size={17} /> },
       { id: 'troca-servico', label: 'Troca de Serviço', icon: <ArrowLeftRight size={17} /> },

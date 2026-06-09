@@ -142,7 +142,9 @@ export function generatePrintHtml(
       rightHtml = `<td colspan="4" class="feriados-header">Feriados</td>`;
     } else if (feriadosDoPeriodo.length > 0 && dayNum > POS_FERIADOS_HEADER && dayNum <= POS_FERIADOS_END) {
       const fd = feriadosDoPeriodo[dayNum - POS_FERIADOS_HEADER - 1]!;
-      rightHtml = `<td colspan="4" class="feriados-item">${esc(ddmm(fd.data))}${fd.descricao ? ` - ${esc(fd.descricao)}` : ''}</td>`;
+      const fdColor = fd.tipo === 'roxa' ? '#7B2FBE' : '#cc0000';
+      const fdDesc = fd.descricao ? ` - ${esc(fd.descricao)}` : '';
+      rightHtml = `<td colspan="4" class="feriados-item"><span style="color:${fdColor};font-weight:bold">${esc(ddmm(fd.data))}</span>${fdDesc}</td>`;
     } else {
       rightHtml = `<td colspan="4"></td>`;
     }

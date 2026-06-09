@@ -15,15 +15,13 @@ interface FormState {
   descricao: string;
 }
 
-const tipoOptions: { value: TipoQuadrinho; label: string }[] = [
-  { value: 'roxa', label: 'Roxa (Feriado especial)' },
-  { value: 'vermelha', label: 'Vermelha (Fim de semana)' },
-  { value: 'amarela', label: 'Amarela (Sexta-feira)' },
-  { value: 'preta', label: 'Preta (Dia útil)' },
+const tipoOptions: { value: TipoQuadrinho; label: string; hint: string }[] = [
+  { value: 'vermelha', label: 'Vermelha', hint: 'Feriados comuns (Tiradentes, 7 de Setembro, etc.)' },
+  { value: 'roxa', label: 'Roxa', hint: 'Carnaval, Natal, Ano Novo e vésperas' },
 ];
 
 function emptyForm(): FormState {
-  return { data: '', tipo: 'roxa', descricao: '' };
+  return { data: '', tipo: 'vermelha', descricao: '' };
 }
 
 function tipoLabel(tipo: TipoQuadrinho): string {
@@ -90,8 +88,8 @@ export default function DatasEspeciais({
     <div>
       <div className="page-header">
         <div>
-          <div className="page-title">Escala Roxa</div>
-          <div className="page-subtitle">Feriados e datas com quadrinho roxa</div>
+          <div className="page-title">Feriados</div>
+          <div className="page-subtitle">Gerencie os feriados que afetam a escala</div>
         </div>
         <button className="btn btn-primary" onClick={openAdd} type="button">
           <Plus size={16} />
@@ -105,7 +103,7 @@ export default function DatasEspeciais({
           <span className="card-title">Adicionar Datas Padrão</span>
         </div>
         <div style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginBottom: '0.75rem' }}>
-          Clique para adicionar rapidamente as datas fixas de cada ano como quadrinho roxa:
+          Datas fixas do ano — clique para adicionar:
         </div>
         <div className="quick-add-grid">
           {years.flatMap(year => [
@@ -159,8 +157,8 @@ export default function DatasEspeciais({
           <div className="empty-state-icon">
             <Star size={48} strokeWidth={1} />
           </div>
-          <div className="empty-state-text">Nenhuma data especial cadastrada</div>
-          <div className="empty-state-sub">Adicione feriados que devem ser tratados como quadrinho roxa</div>
+          <div className="empty-state-text">Nenhum feriado cadastrado</div>
+          <div className="empty-state-sub">Adicione feriados usando o botão acima</div>
         </div>
       ) : (
         <div className="table-wrapper">
@@ -231,7 +229,7 @@ export default function DatasEspeciais({
         <div className="modal-overlay" onClick={closeModal}>
           <div className="modal" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
-              <span className="modal-title">Adicionar Data Especial</span>
+              <span className="modal-title">Adicionar Feriado</span>
               <button className="btn-icon" onClick={closeModal} type="button">
                 <X size={16} />
               </button>
@@ -258,7 +256,7 @@ export default function DatasEspeciais({
                   )}
                 </div>
                 <div className="form-group">
-                  <label htmlFor="de-tipo">Tipo de Quadrinho *</label>
+                  <label htmlFor="de-tipo">Tipo *</label>
                   <select
                     id="de-tipo"
                     value={form.tipo}
@@ -268,8 +266,9 @@ export default function DatasEspeciais({
                       <option key={opt.value} value={opt.value}>{opt.label}</option>
                     ))}
                   </select>
-                  <div style={{ marginTop: '0.375rem' }}>
-                    <span className={`badge badge-${form.tipo}`}>{tipoLabel(form.tipo)}</span>
+                  <div style={{ marginTop: '0.375rem', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                    <span className={`badge badge-${form.tipo}`} style={{ marginRight: '0.5rem' }}>{tipoLabel(form.tipo)}</span>
+                    {tipoOptions.find(o => o.value === form.tipo)?.hint}
                   </div>
                 </div>
                 <div className="form-group">

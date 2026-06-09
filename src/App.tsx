@@ -22,7 +22,7 @@ const telaLabels: Record<Tela, string> = {
   dashboard: 'Início',
   soldados: 'Militares',
   indisponibilidade: 'Indisponibilidade',
-  'datas-especiais': 'Escala Roxa',
+  'datas-especiais': 'Feriados',
   gerar: 'Gerar Escala',
   historico: 'Histórico de Escalas',
   quadrinhos: 'Quadrinhos',
