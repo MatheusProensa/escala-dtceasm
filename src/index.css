@@ -200,7 +200,7 @@ body {
 
 /* ===== Sidebar ===== */
 .sidebar {
-  width: 240px;
+  width: 265px;
   background-color: var(--bg-surface);
   border-right: 1px solid var(--border);
   display: flex;
