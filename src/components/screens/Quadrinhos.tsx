@@ -138,7 +138,7 @@ export default function Quadrinhos({ soldados, escalas }: QuadrinhosProps) {
             { color: COLORS.past.bg,   label: 'Realizado' },
             { color: COLORS.today.bg,  label: 'Hoje' },
             { color: COLORS.future.bg, label: 'Escalado (futuro)' },
-            { color: COLORS.lastro.bg, label: 'LASTRO' },
+            { color: COLORS.lastro.bg, label: 'Lastro' },
           ].map(({ color, label }) => (
             <span key={label} style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
               <span style={{ background: color, width: 12, height: 12, borderRadius: 3, display: 'inline-block', flexShrink: 0 }} />
