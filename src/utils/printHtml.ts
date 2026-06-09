@@ -179,7 +179,7 @@ tr td{height:17px;font-size:8.5pt}
 .weekend .dn,.weekend .da,.weekend .nm{color:#cc0000;font-weight:bold}
 /* Sexta — fundo amarelo só no número e dia, nome sublinhado */
 .friday .dn,.friday .da{background-color:#ffffc0;font-weight:bold}
-.friday .nm{font-weight:bold;text-decoration:underline;text-decoration-color:#b8860b;text-decoration-thickness:2px}
+.friday .nm{font-weight:bold;background-color:#FFFF00;color:#000}
 
 /* Seção direita */
 .ri-header{font-weight:bold;font-size:8pt;padding-left:6px}
@@ -201,7 +201,7 @@ tr td{height:17px;font-size:8.5pt}
   tr td{height:14px}
   .weekend .dn,.weekend .da,.weekend .nm{color:#cc0000 !important;font-weight:bold !important}
   .friday .dn,.friday .da{background-color:#ffffc0 !important;font-weight:bold !important}
-  .friday .nm{font-weight:bold !important;text-decoration:underline !important;text-decoration-color:#b8860b !important}
+  .friday .nm{font-weight:bold !important;background-color:#FFFF00 !important;color:#000 !important}
   .amarela-hl{text-decoration:underline !important;text-decoration-color:#b8860b !important;font-weight:bold !important}
   .vermelha-c{color:#cc0000 !important}
   .feriados-header{background-color:#b2f5ea !important;color:#065f46 !important}
