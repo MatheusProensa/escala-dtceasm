@@ -230,9 +230,9 @@ body {
 
 .sidebar-brand-title {
   font-weight: 700;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   color: var(--text-primary);
-  letter-spacing: 0.05em;
+  white-space: nowrap;
 }
 
 .sidebar-brand-subtitle {
