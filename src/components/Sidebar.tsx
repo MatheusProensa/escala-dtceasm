@@ -33,7 +33,7 @@ export default function Sidebar({ currentTela, onNavigate }: SidebarProps) {
         <div className="sidebar-brand-text">
           <div className="sidebar-brand-subtitle" style={{ marginBottom: '0.1rem' }}>Escala de</div>
           <div className="sidebar-brand-title" style={{ color: 'var(--accent)' }}>Permanência</div>
-          <div className="sidebar-brand-subtitle">DTCEA-SM · FAB</div>
+          <div className="sidebar-brand-subtitle">DTCEA-SM</div>
         </div>
       </div>
 
