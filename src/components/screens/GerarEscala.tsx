@@ -179,22 +179,17 @@ export default function GerarEscala({
             Como funciona
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>
-            <div style={{ display: 'flex', gap: '0.5rem' }}>
-              <span style={{ color: 'var(--accent)', fontWeight: 700, flexShrink: 0 }}>1.</span>
-              Preencha o nome, data de início e data de fim da escala.
-            </div>
-            <div style={{ display: 'flex', gap: '0.5rem' }}>
-              <span style={{ color: 'var(--accent)', fontWeight: 700, flexShrink: 0 }}>2.</span>
-              Clique em <strong>Gerar Prévia</strong> para visualizar a escala antes de salvar.
-            </div>
-            <div style={{ display: 'flex', gap: '0.5rem' }}>
-              <span style={{ color: 'var(--accent)', fontWeight: 700, flexShrink: 0 }}>3.</span>
-              O algoritmo distribui os tipos (Preta, Amarela, Vermelha, Roxa) respeitando a regra de 48h e as indisponibilidades registradas.
-            </div>
-            <div style={{ display: 'flex', gap: '0.5rem' }}>
-              <span style={{ color: 'var(--accent)', fontWeight: 700, flexShrink: 0 }}>4.</span>
-              Confira a prévia e clique em <strong>Salvar Escala</strong> para registrar no histórico.
-            </div>
+            {[
+              'Preencha o nome, data de início e data de fim da escala.',
+              'Clique em "Gerar Prévia" para visualizar a escala antes de salvar.',
+              'O algoritmo distribui os tipos (Preta, Amarela, Vermelha, Roxa) respeitando a regra de 48h e as indisponibilidades registradas.',
+              'Confira a prévia e clique em "Salvar Escala" para registrar no histórico.',
+            ].map((txt, i) => (
+              <div key={i} style={{ display: 'flex', gap: '0.5rem' }}>
+                <span style={{ color: 'var(--accent)', fontWeight: 700, flexShrink: 0 }}>{i + 1}.</span>
+                <span>{txt}</span>
+              </div>
+            ))}
           </div>
         </div>
       )}

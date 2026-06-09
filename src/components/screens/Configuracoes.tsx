@@ -73,11 +73,11 @@ export default function Configuracoes({
         <div className="card-header">
           <span className="card-title">Aparência</span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <span className="text-secondary" style={{ fontSize: '0.875rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+          <span className="text-secondary" style={{ fontSize: '0.875rem', whiteSpace: 'nowrap' }}>
             Tema atual: <strong>{theme === 'dark' ? 'Escuro' : 'Claro'}</strong>
           </span>
-          <button className="btn btn-ghost" onClick={onToggleTheme} type="button">
+          <button className="btn btn-ghost" onClick={onToggleTheme} type="button" style={{ whiteSpace: 'nowrap' }}>
             {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
             {theme === 'dark' ? 'Mudar para tema claro' : 'Mudar para tema escuro'}
           </button>
