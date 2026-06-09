@@ -173,12 +173,13 @@ td{border:1px solid #000;vertical-align:middle;padding:2px 4px}
 
 /* Linhas da escala */
 tr td{height:17px;font-size:8.5pt}
-.dn{width:4%;text-align:center;font-weight:bold}
+.dn{width:4%;text-align:center}
 .da{width:5%;text-align:center}
 .nm{width:24%;font-weight:normal;text-align:center}
 
 /* Fim de semana */
 .weekend .dn,.weekend .da,.weekend .nm{color:#cc0000;font-weight:bold}
+.weekend .dn{color:#000;font-weight:normal}
 /* Sexta — fundo amarelo só no texto (span), não na célula */
 .friday-hl{background-color:#FFFF00;color:#000;padding:0 2px}
 
@@ -202,6 +203,7 @@ tr td{height:17px;font-size:8.5pt}
   body{font-size:8pt}
   tr td{height:14px}
   .weekend .dn,.weekend .da,.weekend .nm{color:#cc0000 !important;font-weight:bold !important}
+  .weekend .dn{color:#000 !important;font-weight:normal !important}
   .friday-hl{background-color:#FFFF00 !important;color:#000 !important;padding:0 2px !important}
   .amarela-hl{text-decoration:underline !important;text-decoration-color:#b8860b !important;font-weight:bold !important}
   .vermelha-c{color:#cc0000 !important}
