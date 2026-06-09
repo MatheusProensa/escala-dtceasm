@@ -50,7 +50,7 @@ export function generatePrintHtml(
   const qCounts = computeQuadrinhos(todasEscalas);
   const activeSoldados = soldados.filter(s => s.ativo);
 
-  function getRanking(tipo: 'preta' | 'amarela' | 'vermelha' | 'roxa'): Soldado[] {
+  function getRanking(tipo: 'preta' | 'amarela' | 'vermelha'): Soldado[] {
     return [...activeSoldados]
       .sort((a, b) => {
         const qa = qCounts[a.id]?.[tipo] ?? 0;
@@ -64,8 +64,7 @@ export function generatePrintHtml(
   const rPreta = getRanking('preta');
   const rAmarela = getRanking('amarela');
   const rVermelha = getRanking('vermelha');
-  const rRoxa = getRanking('roxa');
-  const reservaRows = Math.max(rPreta.length, rAmarela.length, rVermelha.length, rRoxa.length, 1);
+  const reservaRows = Math.max(rPreta.length, rAmarela.length, rVermelha.length, 1);
 
   // Feriados que caem dentro do período da escala
   const feriadosDoPeriodo = datasEspeciais
@@ -82,7 +81,7 @@ export function generatePrintHtml(
   const POS_DATA_START = 18;
   const POS_DATA_END = 17 + reservaRows;
   const POS_FERIADOS_HEADER = POS_DATA_END + 2;
-  const POS_FERIADOS_END = POS_FERIADOS_HEADER + Math.max(feriadosDoPeriodo.length - 1, 0);
+  const POS_FERIADOS_END = POS_FERIADOS_HEADER + feriadosDoPeriodo.length;
 
   let rowsHtml = '';
 
@@ -118,23 +117,21 @@ export function generatePrintHtml(
         <td class="tipo-h">PRETA</td>
         <td class="tipo-h"><span class="amarela-hl">AMARELA</span></td>
         <td class="tipo-h vermelha-c">VERMELHA</td>
-        <td class="tipo-h">ROXA</td>`;
+        <td class="tipo-h roxa-c">ROXA</td>`;
     } else if (D >= POS_DATA_START && dayNum >= POS_DATA_START && dayNum <= POS_DATA_END) {
       const idx = dayNum - POS_DATA_START;
       const p = rPreta[idx];
       const a = rAmarela[idx];
       const v = rVermelha[idx];
-      const r = rRoxa[idx];
       rightHtml = `
         <td class="re-cell">${p ? esc(militarLabel(soldados, p.id)) : ''}</td>
         <td class="re-cell"><span class="amarela-hl">${a ? esc(militarLabel(soldados, a.id)) : ''}</span></td>
         <td class="re-cell vermelha-c">${v ? esc(militarLabel(soldados, v.id)) : ''}</td>
-        <td class="re-cell">${r ? esc(militarLabel(soldados, r.id)) : ''}</td>`;
+        <td class="re-cell"></td>`;
     } else if (feriadosDoPeriodo.length > 0 && dayNum === POS_FERIADOS_HEADER) {
-      const fd = feriadosDoPeriodo[0]!;
-      rightHtml = `<td colspan="4" class="feriados-header">Feriados: ${esc(ddmm(fd.data))}${fd.descricao ? ` - ${esc(fd.descricao)}` : ''}</td>`;
-    } else if (feriadosDoPeriodo.length > 1 && dayNum > POS_FERIADOS_HEADER && dayNum <= POS_FERIADOS_END) {
-      const fd = feriadosDoPeriodo[dayNum - POS_FERIADOS_HEADER]!;
+      rightHtml = `<td colspan="4" class="feriados-header">Feriados</td>`;
+    } else if (feriadosDoPeriodo.length > 0 && dayNum > POS_FERIADOS_HEADER && dayNum <= POS_FERIADOS_END) {
+      const fd = feriadosDoPeriodo[dayNum - POS_FERIADOS_HEADER - 1]!;
       rightHtml = `<td colspan="4" class="feriados-item">${esc(ddmm(fd.data))}${fd.descricao ? ` - ${esc(fd.descricao)}` : ''}</td>`;
     } else {
       rightHtml = `<td colspan="4"></td>`;
@@ -190,9 +187,10 @@ tr td{height:17px;font-size:8.5pt}
 .tipo-h{font-weight:bold;text-align:center;font-size:8pt;width:16.75%}
 .amarela-hl{text-decoration:underline;text-decoration-color:#b8860b;text-decoration-thickness:2px;font-weight:bold}
 .vermelha-c{color:#cc0000}
+.roxa-c{color:#7B2FBE}
 .re-cell{text-align:center;font-size:8pt;width:16.75%}
-.feriados-header{background-color:#b2f5ea;font-weight:bold;font-size:8pt;padding-left:6px;color:#065f46}
-.feriados-item{font-size:8pt;padding-left:6px;background-color:#e6fffa}
+.feriados-header{background-color:#00FFFF;font-weight:bold;font-size:8.5pt;text-align:center;color:#000;padding:3px 4px}
+.feriados-item{font-size:8pt;padding-left:6px}
 
 @media print{
   *{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important}
@@ -204,7 +202,8 @@ tr td{height:17px;font-size:8.5pt}
   .friday .nm{font-weight:bold !important;background-color:#FFFF00 !important;color:#000 !important}
   .amarela-hl{text-decoration:underline !important;text-decoration-color:#b8860b !important;font-weight:bold !important}
   .vermelha-c{color:#cc0000 !important}
-  .feriados-header{background-color:#b2f5ea !important;color:#065f46 !important}
+  .roxa-c{color:#7B2FBE !important}
+  .feriados-header{background-color:#00FFFF !important;color:#000 !important}
 }
 </style>
 <script>window.onload=function(){setTimeout(function(){window.print()},400)}</script>
