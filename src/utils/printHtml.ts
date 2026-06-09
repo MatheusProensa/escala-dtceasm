@@ -92,9 +92,13 @@ export function generatePrintHtml(
     const dayAbbrev = DAY_ABBREV[dow] ?? '';
     const nomeMilitar = esc(militarLabel(soldados, dia.soldadoId));
 
+    const isFriday = dow === 5;
     let rowClass = '';
     if (dow === 0 || dow === 6) rowClass = 'weekend';
-    else if (dow === 5) rowClass = 'friday';
+    else if (isFriday) rowClass = 'friday';
+
+    const dayAbbrevHtml = isFriday ? `<span class="friday-hl">${dayAbbrev}</span>` : dayAbbrev;
+    const nomeMilitarHtml = isFriday ? `<span class="friday-hl">${nomeMilitar}</span>` : nomeMilitar;
 
     let rightHtml = '';
 
@@ -140,8 +144,8 @@ export function generatePrintHtml(
     rowsHtml += `
       <tr class="${rowClass}">
         <td class="dn">${String(dayNum).padStart(2, '0')}</td>
-        <td class="da">${dayAbbrev}</td>
-        <td class="nm">${nomeMilitar}</td>
+        <td class="da">${dayAbbrevHtml}</td>
+        <td class="nm">${nomeMilitarHtml}</td>
         ${rightHtml}
       </tr>`;
   }
@@ -175,9 +179,8 @@ tr td{height:17px;font-size:8.5pt}
 
 /* Fim de semana */
 .weekend .dn,.weekend .da,.weekend .nm{color:#cc0000;font-weight:bold}
-/* Sexta — fundo amarelo no dia e no nome, ambos negrito */
-.friday .da{background-color:#FFFF00;color:#000;font-weight:bold}
-.friday .nm{background-color:#FFFF00;color:#000;font-weight:bold}
+/* Sexta — fundo amarelo só no texto (span), não na célula */
+.friday-hl{background-color:#FFFF00;color:#000;font-weight:bold;padding:0 2px}
 
 /* Seção direita */
 .ri-header{font-weight:bold;font-size:8pt;padding-left:6px}
@@ -199,8 +202,7 @@ tr td{height:17px;font-size:8.5pt}
   body{font-size:8pt}
   tr td{height:14px}
   .weekend .dn,.weekend .da,.weekend .nm{color:#cc0000 !important;font-weight:bold !important}
-  .friday .da{background-color:#FFFF00 !important;color:#000 !important;font-weight:bold !important}
-  .friday .nm{background-color:#FFFF00 !important;color:#000 !important;font-weight:bold !important}
+  .friday-hl{background-color:#FFFF00 !important;color:#000 !important;font-weight:bold !important;padding:0 2px !important}
   .amarela-hl{text-decoration:underline !important;text-decoration-color:#b8860b !important;font-weight:bold !important}
   .vermelha-c{color:#cc0000 !important}
   .roxa-c{color:#7B2FBE !important}
