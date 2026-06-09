@@ -113,11 +113,10 @@ export default function Soldados({
           <table>
             <thead>
               <tr>
-                <th>Ordem</th>
-                <th>Patente</th>
-                <th>Nome</th>
+                <th style={{ width: 60 }}>Ordem</th>
+                <th>Militar</th>
                 <th>Quadrinhos</th>
-                <th>Ações</th>
+                <th style={{ width: 80 }}>Ações</th>
               </tr>
             </thead>
             <tbody>
@@ -127,9 +126,9 @@ export default function Soldados({
                 const isLast = idx === sorted.length - 1;
                 return (
                   <tr key={s.id}>
-                    <td>
+                    <td style={{ padding: '0.375rem 0.5rem' }}>
                       <div className="flex items-center gap-1">
-                        <span className="font-mono text-secondary" style={{ minWidth: 24 }}>{s.ordemAntiguidade}</span>
+                        <span className="font-mono text-secondary" style={{ minWidth: 18, fontSize: '0.8rem' }}>{s.ordemAntiguidade}</span>
                         <div className="flex flex-col gap-1">
                           <button
                             className="btn-icon"
@@ -137,8 +136,9 @@ export default function Soldados({
                             disabled={isFirst}
                             title="Mover para cima"
                             type="button"
+                            style={{ padding: '0.2rem' }}
                           >
-                            <ChevronUp size={12} />
+                            <ChevronUp size={11} />
                           </button>
                           <button
                             className="btn-icon"
@@ -146,17 +146,18 @@ export default function Soldados({
                             disabled={isLast}
                             title="Mover para baixo"
                             type="button"
+                            style={{ padding: '0.2rem' }}
                           >
-                            <ChevronDown size={12} />
+                            <ChevronDown size={11} />
                           </button>
                         </div>
                       </div>
                     </td>
                     <td>
-                      <span className="text-secondary">{s.patente || '—'}</span>
-                    </td>
-                    <td>
-                      <span style={{ fontWeight: 500 }}>{s.nome}</span>
+                      <span style={{ fontWeight: 500 }}>
+                        {s.patente && <span className="text-secondary" style={{ marginRight: '0.3rem', fontSize: '0.8rem' }}>{s.patente}</span>}
+                        {s.nome}
+                      </span>
                     </td>
                     <td>
                       <div className="flex items-center gap-1">
