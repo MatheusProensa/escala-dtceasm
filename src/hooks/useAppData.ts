@@ -57,7 +57,7 @@ export function useAppData() {
       if (indispRes.error) throw indispRes.error;
       if (datasRes.error) throw datasRes.error;
       if (escalasRes.error) throw escalasRes.error;
-      if (trocasRes.error) throw trocasRes.error;
+      // trocas_servico pode ainda não existir — não bloqueia o carregamento
 
       setData({
         soldados: (soldadosRes.data ?? []).map(s => ({
@@ -87,7 +87,7 @@ export function useAppData() {
           dias: e.dias as Escala['dias'],
           geradaEm: e.gerada_em as string,
         })),
-        trocas: (trocasRes.data ?? []).map(t => ({
+        trocas: trocasRes.error ? [] : (trocasRes.data ?? []).map(t => ({
           id: t.id as string,
           data: t.data as string,
           soldadoSubstituidoId: t.soldado_substituido_id as string,
