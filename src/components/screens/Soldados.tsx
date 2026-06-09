@@ -111,12 +111,18 @@ export default function Soldados({
       ) : (
         <div className="table-wrapper">
           <table>
+            <colgroup>
+              <col style={{ width: 70 }} />
+              <col style={{ width: '35%' }} />
+              <col />
+              <col style={{ width: 100 }} />
+            </colgroup>
             <thead>
               <tr>
-                <th style={{ width: 60 }}>Ordem</th>
+                <th>Ordem</th>
                 <th>Militar</th>
                 <th>Quadrinhos</th>
-                <th style={{ width: 80 }}>Ações</th>
+                <th>Ações</th>
               </tr>
             </thead>
             <tbody>
