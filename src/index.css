@@ -292,6 +292,18 @@ body {
   background-color: var(--danger-hover);
 }
 
+.btn-secondary {
+  background-color: transparent;
+  color: var(--text-primary);
+  border: 1.5px solid var(--border-light);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: var(--bg-elevated);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
 .btn-ghost {
   background-color: transparent;
   color: var(--text-secondary);
