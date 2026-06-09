@@ -63,7 +63,7 @@ export default function Configuracoes({
             <Info size={14} style={{ flexShrink: 0 }} />
             <span>Estes dados são preenchidos automaticamente no PDF do modelo oficial.</span>
           </div>
-          <button className="btn btn-primary" type="submit">
+          <button className="btn btn-primary mt-4" type="submit">
             {saved ? '✓ Salvo!' : 'Salvar'}
           </button>
         </form>
