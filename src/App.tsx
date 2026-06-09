@@ -21,7 +21,7 @@ const telaLabels: Record<Tela, string> = {
   dashboard: 'Início',
   soldados: 'Militares',
   indisponibilidade: 'Indisponibilidade',
-  'datas-especiais': 'Datas Especiais',
+  'datas-especiais': 'Escala Roxa',
   gerar: 'Gerar Escala',
   historico: 'Histórico de Escalas',
   quadrinhos: 'Quadrinhos',
@@ -191,7 +191,6 @@ export default function App() {
       }
       topbar={
         <Topbar
-          title={telaLabels[currentTela]}
           theme={settings.theme}
           onToggleTheme={settings.toggleTheme}
           onToggleSidebar={() => setSidebarOpen(o => !o)}
