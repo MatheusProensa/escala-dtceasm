@@ -163,8 +163,9 @@ td{border:1px solid #000;vertical-align:middle;padding:2px 4px}
 .h-mes{font-size:14pt;font-weight:bold;text-align:center;vertical-align:middle}
 .h-orgao{font-size:7pt;text-align:center;vertical-align:middle;line-height:1.4}
 .h-orgao strong{font-size:9pt}
-.h-rl{font-size:7pt;color:#333;text-align:center;vertical-align:bottom;padding-bottom:2px;height:18px}
-.h-rv{font-size:10pt;font-weight:bold;text-align:center;vertical-align:bottom;padding-bottom:4px;height:44px}
+.h-right{vertical-align:top;padding:5px 8px;height:62px}
+.h-rl{font-size:7pt;color:#333;text-align:center}
+.h-rv{font-size:11pt;font-weight:bold;text-align:center;margin-top:10px}
 
 /* Linhas da escala */
 tr td{height:17px;font-size:8.5pt}
@@ -217,19 +218,21 @@ tr td{height:17px;font-size:8.5pt}
   <tr>
     <td rowspan="2" class="h-logo">BASM<br>DTCEA - SM</td>
     <td rowspan="2" class="h-mes-label">ESCALA DO MÊS / ANO:</td>
-    <td class="h-rl">ESCALANTE</td>
+    <td rowspan="2" class="h-right">
+      <div class="h-rl">ESCALANTE:</div>
+      <div class="h-rv">${esc(escalante)}</div>
+    </td>
   </tr>
-  <tr>
-    <td class="h-rv">${esc(escalante)}</td>
-  </tr>
+  <tr></tr>
   <tr>
     <td rowspan="2" class="h-orgao">ÓRGÃO<br><strong>PERMANÊNCIA<br>DTCEA-SM</strong></td>
     <td rowspan="2" class="h-mes">${esc(mesAno)}</td>
-    <td class="h-rl">COMANDANTE DO DTCEA-SM</td>
+    <td rowspan="2" class="h-right">
+      <div class="h-rl">COMANDANTE DO DTCEA-SM</div>
+      <div class="h-rv">${esc(comandante)}</div>
+    </td>
   </tr>
-  <tr>
-    <td class="h-rv">${esc(comandante)}</td>
-  </tr>
+  <tr></tr>
 </table>
 
 <table>
