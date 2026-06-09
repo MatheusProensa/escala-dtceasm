@@ -20,18 +20,14 @@ interface StatCardProps {
 function StatCard({ icon, iconBg, iconColor, value, label, sub, onClick }: StatCardProps) {
   return (
     <div className="stat-card" onClick={onClick} style={{ cursor: 'pointer' }}>
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem' }}>
-        <div style={{
-          width: 52, height: 52, borderRadius: 12, flexShrink: 0,
-          background: iconBg, color: iconColor,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-        }}>
+      <div className="stat-card-inner">
+        <div className="stat-card-icon" style={{ background: iconBg, color: iconColor }}>
           {icon}
         </div>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>{label}</div>
-          <div style={{ fontSize: '2rem', fontWeight: 700, lineHeight: 1, color: 'var(--text-primary)' }}>{value}</div>
-          <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '0.375rem' }}>{sub}</div>
+        <div className="stat-card-body">
+          <div className="stat-card-label">{label}</div>
+          <div className="stat-card-value">{value}</div>
+          <div className="stat-card-sub">{sub}</div>
         </div>
       </div>
     </div>
