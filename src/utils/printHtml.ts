@@ -119,7 +119,7 @@ export function generatePrintHtml(
     } else if (D >= POS_TIPO_HEADER && dayNum === POS_TIPO_HEADER) {
       rightHtml = `
         <td class="tipo-h">PRETA</td>
-        <td class="tipo-h"><span class="amarela-hl">AMARELA</span></td>
+        <td class="tipo-h"><span class="friday-hl">AMARELA</span></td>
         <td class="tipo-h vermelha-c">VERMELHA</td>
         <td class="tipo-h roxa-c">ROXA</td>`;
     } else if (D >= POS_DATA_START && dayNum >= POS_DATA_START && dayNum <= POS_DATA_END) {
@@ -129,8 +129,8 @@ export function generatePrintHtml(
       const v = rVermelha[idx];
       rightHtml = `
         <td class="re-cell">${p ? esc(militarLabel(soldados, p.id)) : ''}</td>
-        <td class="re-cell"><span class="amarela-hl">${a ? esc(militarLabel(soldados, a.id)) : ''}</span></td>
-        <td class="re-cell vermelha-c">${v ? esc(militarLabel(soldados, v.id)) : ''}</td>
+        <td class="re-cell">${a ? esc(militarLabel(soldados, a.id)) : ''}</td>
+        <td class="re-cell">${v ? esc(militarLabel(soldados, v.id)) : ''}</td>
         <td class="re-cell"></td>`;
     } else if (feriadosDoPeriodo.length > 0 && dayNum === POS_FERIADOS_HEADER) {
       rightHtml = `<td colspan="4" class="feriados-header">Feriados</td>`;
